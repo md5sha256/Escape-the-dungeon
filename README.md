@@ -36,6 +36,18 @@ One skill point is added and the player is able to reallocate their skill points
 A random incident would be generated, different choices are provided and the player is able to choose one of them. Each one would have its pros and cons.
 - Randomness in incident generation
 
+## Program process
+-start (Background information, skill point allocation)
+-Path generation, 3 lists with 10 nodes each
+-Variable 'Current', move along each node in the path, from 0 to 9
+-Generate event according to 'Current'
+-Update status of player
 
-
-
+## Program components
+-header.h (Include all the global variables including status of player)
+-player_status (Print player's status)
+-start.cpp (Background information, skill point allocation)
+-fight.cpp (Generate monster when called)
+-campfire.cpp (Let player decide if heal HP or allocate one more skill point)
+-shop.cpp (Provide new cards that player can buy)
+-boss.cpp (Generate a boss, if boss defeated --> win, else --> lose)
