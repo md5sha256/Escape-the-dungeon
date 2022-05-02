@@ -50,7 +50,7 @@ A random incident would be generated, different choices are provided and the pla
 
 ## Program components
 - header.h (Include all the global variables including status of player)
-- player_status (Print player's status)
+- player_status.cpp (Print player's status)
 - start.cpp (Background information, skill point allocation)
 - fight.cpp (Generate monster when called)
 - campfire.cpp (Let player decide if heal HP or allocate one more skill point)
