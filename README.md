@@ -37,11 +37,11 @@ A random incident would be generated, different choices are provided and the pla
 - Randomness in incident generation
 
 ## Program process
--start (Background information, skill point allocation)
--Path generation, 3 lists with 10 nodes each
--Variable 'Current', move along each node in the path, from 0 to 9
--Generate event according to 'Current'
--Update status of player
+- start (Background information, skill point allocation)
+- Path generation, 3 lists with 10 nodes each
+- Variable 'Current', move along each node in the path, from 0 to 9
+- Generate event according to 'Current'
+- Update status of player
 
 ## Program components
 - header.h (Include all the global variables including status of player)
