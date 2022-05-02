@@ -49,7 +49,7 @@ A random incident would be generated, different choices are provided and the pla
 - Update status of player
 
 ## Program components
-- header.h (Include all the global variables including status of player)
+- header.h (Include all the global variables including status of player, also declaration of other .cpp files)
 - player_status.cpp (Print player's status)
 - start.cpp (Background information, skill point allocation)
 - fight.cpp (Generate monster when called)
