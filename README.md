@@ -44,10 +44,10 @@ A random incident would be generated, different choices are provided and the pla
 -Update status of player
 
 ## Program components
--header.h (Include all the global variables including status of player)\n
--player_status (Print player's status)
--start.cpp (Background information, skill point allocation)
--fight.cpp (Generate monster when called)
--campfire.cpp (Let player decide if heal HP or allocate one more skill point)
--shop.cpp (Provide new cards that player can buy)
--boss.cpp (Generate a boss, if boss defeated --> win, else --> lose)
+- header.h (Include all the global variables including status of player)
+- player_status (Print player's status)
+- start.cpp (Background information, skill point allocation)
+- fight.cpp (Generate monster when called)
+- campfire.cpp (Let player decide if heal HP or allocate one more skill point)
+- shop.cpp (Provide new cards that player can buy)
+- boss.cpp (Generate a boss, if boss defeated --> win, else --> lose)
