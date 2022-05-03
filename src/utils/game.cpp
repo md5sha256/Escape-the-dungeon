@@ -116,7 +116,7 @@ class SimpleGameClient : public GameClient {
         loadData();
         initPlayer(*player);
         while (running) {
-            if (awaitUserInput()) {
+            if (!awaitUserInput()) {
                 checkPosition();
             }
         }
