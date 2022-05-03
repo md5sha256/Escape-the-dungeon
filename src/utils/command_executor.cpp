@@ -22,6 +22,9 @@ class SimpleExecutor : public CommandExecutor {
     }
 
     ~SimpleExecutor() {
+        for (std::pair<string, Command*> p : registeredCommands) {
+            delete p.second;
+        }
         registeredCommands.clear();
     }
 

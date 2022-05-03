@@ -18,13 +18,13 @@ class SimpleCommandParser : public CommandParser {
         std::stringstream ss(raw);
         std::string cmdName;
         if (ss >> cmdName) {
-            if (cmdName.empty() || cmdName == "exit" || cmdName[0] != identifier) {
-                // Not a command
-                std::cout << "not a command: " << cmdName << std::endl;
+            if (cmdName.empty() || cmdName[0] != identifier) {
+                printf("%s: %s\n", "Unknown command: ", cmdName.data());
                 return nullopt<CommandData>();
             }
         } else {
             // Not enough input/blank string
+            std::cout << "Blank command entered. Please enter a command." << std::endl;
             return nullopt<CommandData>();
         }
         std::vector<std::string> args;

@@ -4,15 +4,15 @@ SDIR = src
 UTILS = $(SDIR)/utils
 OBJECTS =
 
-all: game
+all: game1
 	cp $<.o $@.o
 
 # FIXME: this target
-game: $(wildcard $(SDIR)/*.cpp) $(wildcard $(UTILS)/*.cpp)
+game1: $(wildcard $(SDIR)/*.cpp) $(wildcard $(UTILS)/*.cpp)
 	g++ $(FLAGS) $^ -o $@.o
 
-demo: src/demo.cpp $(UTILS)
-	g++ $(FLAGS) $< -o $@.o
+demo: src/demo.cpp $(wildcard $(UTILS)/*.cpp)
+	g++ $(FLAGS) $^ -o $@.o
 
 main: src/main.cpp $(UTILS)
 	g++ $(FLAGS) $^ -o $@.o
@@ -25,4 +25,3 @@ clean:
 
 .SILENT:
 	clean
-	all
