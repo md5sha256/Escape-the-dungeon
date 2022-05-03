@@ -12,10 +12,11 @@ int main(){
 	start(p);
 	while(p.position!=10){
 		if(p.path[p.position]==0){//when battle is encountered
-
+			vector<enemy> enemy_generated;
+			enemy_generated=generate_enemies();
 		}
 		else if(p.path[p.position]==1){//when campfire is encountered
-
+			campfire(p);
 		}
 		else if(p.path[p.position]==2){//when shop is encountered
 
