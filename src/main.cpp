@@ -2,8 +2,6 @@
 #include<algorithm>
 #include<string>
 #include"playerinfo.hpp"
-#include"start.hpp"
-#include"campfire.hpp"
 
 using namespace std;
 
