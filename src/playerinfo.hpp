@@ -1,5 +1,5 @@
-#ifndef HEADER_H
-#define HEADER_H
+#ifndef PLAYERINFO_HPP
+#define PLAYERINFO_HPP
 #include<string>
 #include<vector>
 #include<iostream>
@@ -179,4 +179,4 @@ void random_event(player_info p);
 void boss(player_info p);
 
 
-#endif
+#endif//PLAYERINFO_HPP
