@@ -11,13 +11,11 @@ class EchoCommand : public Command {
     EchoCommand() : Command::Command("echo") {
     }
 
-    bool onCommand(std::vector<std::string> args) noexcept(false) override {
-        std::stringstream ss;
+    bool onCommand(std::vector<std::string> &args) noexcept(false) override {
         for (const std::string &s : args) {
-            ss << s << " ";
+            std::cout << s << " ";
         }
-        std::string ret = ss.str();
-        std::cout << ret << std::endl;
+        std::cout << std::endl;
         return true;
     }
 };

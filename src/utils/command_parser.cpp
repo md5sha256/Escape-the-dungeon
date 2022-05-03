@@ -18,7 +18,6 @@ class SimpleCommandParser : public CommandParser {
         std::stringstream ss(raw);
         std::string cmdName;
         if (ss >> cmdName) {
-            std::cout << cmdName << std::endl;
             if (cmdName.empty() || cmdName == "exit" || cmdName[0] != identifier) {
                 // Not a command
                 std::cout << "not a command: " << cmdName << std::endl;

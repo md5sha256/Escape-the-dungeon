@@ -1,10 +1,10 @@
 #ifndef COMMAND_HPP
 #define COMMAND_HPP
 
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
-
 
 struct CommandData {
 
@@ -33,6 +33,16 @@ struct CommandData {
     std::vector<std::string> getArgs() const {
         return std::vector<std::string>{args};
     }
+
+    std::string to_string() const {
+        std::stringstream ss;
+        ss << "cmd name: " << commandName << std::endl;
+        for (const std::string &s : args) {
+            ss << s << std::endl;
+        }
+        return ss.str();
+    }
+
 };
 
 
@@ -54,16 +64,18 @@ class Command {
      */
     std::string name;
 
-    public:
+    protected:
     explicit Command(const std::string &_name) {
         name = _name;
     }
+
+    public:
     /**
      * Called when the command is executed by the user
      * @param args The arguments in the order they were passed
      * @return Return true if the command was executed successfully, false otherwise
      */
-    virtual bool onCommand(std::vector<std::string> args) noexcept(false) = 0;
+    virtual bool onCommand(std::vector<std::string> &args) noexcept(false) = 0;
 
     std::string getName() const noexcept(true) {
         return std::string{name};

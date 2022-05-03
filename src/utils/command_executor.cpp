@@ -1,4 +1,5 @@
 #include "command_executor.hpp"
+#include <iostream>
 
 class SimpleExecutor : public CommandExecutor {
 
@@ -51,8 +52,8 @@ class SimpleExecutor : public CommandExecutor {
             return false;
         }
         Command *command = optionalCmd.value();
-        printf("%s", command->getName().data());
-        return command->onCommand(data.getArgs());
+        std::vector<string> args = data.getArgs();
+        return command->onCommand(args);
     }
 };
 
