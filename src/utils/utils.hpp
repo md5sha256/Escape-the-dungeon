@@ -1,21 +1,20 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-#ifdef WINDOWS
-#include <direct.h>
-#define GetCurrentDir _getcwd
-#else
-#include <unistd.h>
-#define GetCurrentDir getcwd
-#endif
+#include "string"
 
-#include<iostream>
+std::string toLowercase(std::string string) {
+    for (char &c : string) {
+        c = (char) tolower(c);
+    }
+    return string;
+}
 
-std::string getWorkDir() {
-    char buff[FILENAME_MAX]; //create string buffer to hold path
-    GetCurrentDir( buff, FILENAME_MAX );
-    std::string current_working_dir(buff);
-    return current_working_dir;
+std::string toUppercase(std::string string) {
+    for (char &c : string) {
+        c = (char) toupper(c);
+    }
+    return string;
 }
 
 #endif//UTILS_HPP

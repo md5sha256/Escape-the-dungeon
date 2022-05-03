@@ -4,8 +4,12 @@
 #include "command.hpp"
 #include "map"
 #include "optional.hpp"
+#include "../playerinfo.hpp"
 
 class CommandExecutor {
+
+    protected:
+    typedef player_info PlayerInfo;
 
     public:
     virtual ~CommandExecutor() = default;
@@ -16,7 +20,7 @@ class CommandExecutor {
 
     virtual bool registerCommand(Command *command) noexcept(false) = 0;
 
-    virtual bool executeCommand(const CommandData &command) noexcept(false) = 0;
+    virtual bool executeCommand(PlayerInfo &player, const CommandData &command) noexcept(false) = 0;
 };
 
 CommandExecutor* newCmdExecutor();

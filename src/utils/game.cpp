@@ -3,15 +3,16 @@
 #include "../model/cardtemplate.hpp"
 #include "command_executor.hpp"
 #include "command_parser.hpp"
+#include "commands.hpp"
 #include "database.hpp"
 #include "registry.hpp"
-#include "commands.cpp"
 
 class SimpleGameClient : public GameClient {
 
     CommandExecutor *commandExecutor = nullptr;
     CommandParser *commandParser = nullptr;
     Database *database = nullptr;
+    PlayerInfo* player = nullptr;
 
     bool running = false;
 
@@ -25,8 +26,11 @@ class SimpleGameClient : public GameClient {
 
     void loadData() noexcept(false) {
         validateState();
+        player = new PlayerInfo;
         std::cout << "Loading data..." << std::endl;
-        database->load();
+        if (database != nullptr) {
+            database->load();
+        }
         std::cout << "Data loading complete!" << std::endl;
     }
 
@@ -38,23 +42,49 @@ class SimpleGameClient : public GameClient {
         commandExecutor->registerCommand(exitCommand);
     }
 
-    void awaitUserInput() {
+    bool awaitUserInput() {
         validateState();
         optional<CommandData> input = commandParser->processCommand();
         if (input.is_present()) {
             try {
-                commandExecutor->executeCommand(*input.value());
+                commandExecutor->executeCommand(*player, *input.value());
             } catch (CommandExecutionError &ex) {
                 printf("%s\n", "An unexpected error occurred when handling the previous command");
                 std::cerr << ex.what() << std::endl;
             }
+            // Delete the CommandData once it's been used
+            delete input.value();
+            return true;
         }
-        // Delete the CommandData once it's been used
-        delete input.value();
+        return false;
+    }
+
+    void checkPosition() {
+        PlayerInfo p = *player;
+        while(p.position!=10){
+            if(p.path[p.position]==0){//when battle is encountered
+                vector<enemy> enemy_generated;
+                enemy_generated=generate_enemies();
+            }
+            else if(p.path[p.position]==1){//when campfire is encountered
+                campfire(p);
+            }
+            else if(p.path[p.position]==2){//when shop is encountered
+
+            }
+            else if(p.path[p.position]==3){//when random event is encountered
+
+            }
+            else if(p.path[p.position]==4){//when boss is encountered
+
+            }
+
+            p.position+=1;
+        }
     }
 
     public:
-    SimpleGameClient(const std::string &root) {
+    explicit SimpleGameClient(const std::string &root) {
         dataDir = root;
     }
 
@@ -84,8 +114,11 @@ class SimpleGameClient : public GameClient {
 
         registerCommands();
         loadData();
+        initPlayer(*player);
         while (running) {
-            awaitUserInput();
+            if (awaitUserInput()) {
+                checkPosition();
+            }
         }
         // Shutdown as we are no longer running
         shutdown();
@@ -99,6 +132,11 @@ class SimpleGameClient : public GameClient {
         // Call stop just in case we aren't already stopped
         stop();
     }
+
+    [[nodiscard]] PlayerInfo *getPlayer() const noexcept(true) override {
+        return player;
+    }
+
 };
 
 GameClient *newGameClient(const std::string &rootDir) noexcept(true) {

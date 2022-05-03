@@ -14,10 +14,6 @@ class optional {
         ptr = t;
     }
 
-    ~optional() {
-        delete ptr;
-    }
-
     [[nodiscard]] bool is_present() const noexcept(true) {
         return ptr != nullptr;
     }

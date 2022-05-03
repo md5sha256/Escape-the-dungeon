@@ -1,6 +1,7 @@
 #ifndef COMMAND_HPP
 #define COMMAND_HPP
 
+#include "../playerinfo.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -21,10 +22,7 @@ struct CommandData {
     CommandData(const struct CommandData::CommandData &data) : CommandData(data.commandName, data.args) {
     }
 
-    ~CommandData() {
-        commandName = "";
-        args.clear();
-    }
+    ~CommandData() = default;
 
     std::string getCommandName() const {
         return std::string{commandName};
@@ -42,9 +40,7 @@ struct CommandData {
         }
         return ss.str();
     }
-
 };
-
 
 struct CommandExecutionError : std::runtime_error {
 
@@ -57,6 +53,9 @@ struct CommandExecutionError : std::runtime_error {
 };
 
 class Command {
+
+    protected:
+    typedef player_info PlayerInfo;
 
     private:
     /**
@@ -77,12 +76,23 @@ class Command {
      * @param args The arguments in the order they were passed
      * @return Return true if the command was executed successfully, false otherwise
      */
-    virtual bool onCommand(std::vector<std::string> &args) noexcept(false) = 0;
+    virtual bool onCommand(PlayerInfo &player, std::vector<std::string> &args) noexcept(false) = 0;
+
+    virtual void printUsages() const noexcept(true) {
+
+    }
 
     std::string getName() const noexcept(true) {
         return std::string{name};
     }
 
+    static void printLines(const vector<string> &messages) {
+        for (const std::string& msg : messages) {
+            if (!msg.empty()) {
+                std::cout << msg << std::endl;
+            }
+        }
+    }
 };
 
-#endif //COMMAND_HPP
+#endif//COMMAND_HPP
