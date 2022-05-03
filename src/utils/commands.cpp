@@ -25,6 +25,10 @@ class ExitCommand : public Command {
         gameClient = client;
     }
 
+    ~ExitCommand() override {
+        delete gameClient;
+    }
+
     bool onCommand(std::vector<std::string> &args) noexcept(false) override {
         std::cout << "Are you sure you want to exit the game? (y/n)" << std::endl;
         std::string input;

@@ -11,7 +11,11 @@
 
 class CommandParser {
 
+    protected:
+    CommandParser() = default;
     public:
+    virtual ~CommandParser() = default;
+
     virtual optional<CommandData> processCommand() noexcept(true) = 0;
 };
 

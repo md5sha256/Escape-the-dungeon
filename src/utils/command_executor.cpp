@@ -21,7 +21,7 @@ class SimpleExecutor : public CommandExecutor {
 
     }
 
-    ~SimpleExecutor() {
+    ~SimpleExecutor() override {
         for (std::pair<string, Command*> p : registeredCommands) {
             delete p.second;
         }

@@ -1,23 +1,39 @@
 #include "game.hpp"
+
+#include "../model/cardtemplate.hpp"
+#include "command_executor.hpp"
+#include "command_parser.hpp"
+#include "database.hpp"
+#include "registry.hpp"
 #include "commands.cpp"
 
 class SimpleGameClient : public GameClient {
 
     CommandExecutor *commandExecutor = nullptr;
     CommandParser *commandParser = nullptr;
+    Database *database = nullptr;
 
     bool running = false;
 
-    void validateState() const noexcept(false){
+    std::string dataDir;
+
+    void validateState() const noexcept(false) {
         if (!running) {
             throw std::runtime_error("Client is not running!");
         }
     }
 
+    void loadData() noexcept(false) {
+        validateState();
+        std::cout << "Loading data..." << std::endl;
+        database->load();
+        std::cout << "Data loading complete!" << std::endl;
+    }
+
     void registerCommands() noexcept(false) {
         validateState();
-        Command* echoCommand = new EchoCommand;
-        Command* exitCommand = new ExitCommand(this);
+        Command *echoCommand = new EchoCommand;
+        Command *exitCommand = new ExitCommand(this);
         commandExecutor->registerCommand(echoCommand);
         commandExecutor->registerCommand(exitCommand);
     }
@@ -38,13 +54,14 @@ class SimpleGameClient : public GameClient {
     }
 
     public:
-    SimpleGameClient() = default;
+    SimpleGameClient(const std::string &root) {
+        dataDir = root;
+    }
 
-    ~SimpleGameClient() {
+    ~SimpleGameClient() override {
         delete commandExecutor;
         delete commandParser;
     }
-
 
     bool isRunning() noexcept(true) override {
         return running;
@@ -56,6 +73,7 @@ class SimpleGameClient : public GameClient {
         }
         commandExecutor = newCmdExecutor();
         commandParser = newCmdParser();
+        database = newDatabase(dataDir);
     }
 
     void start() noexcept(false) override {
@@ -65,6 +83,7 @@ class SimpleGameClient : public GameClient {
         running = true;
 
         registerCommands();
+        loadData();
         while (running) {
             awaitUserInput();
         }
@@ -82,6 +101,6 @@ class SimpleGameClient : public GameClient {
     }
 };
 
-GameClient* newGameClient() noexcept(true) {
-    return new SimpleGameClient;
+GameClient *newGameClient(const std::string &rootDir) noexcept(true) {
+    return new SimpleGameClient{rootDir};
 }

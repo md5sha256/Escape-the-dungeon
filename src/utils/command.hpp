@@ -70,6 +70,8 @@ class Command {
     }
 
     public:
+    virtual ~Command() = default;
+
     /**
      * Called when the command is executed by the user
      * @param args The arguments in the order they were passed

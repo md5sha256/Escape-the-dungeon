@@ -1,13 +1,13 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "command.hpp"
-#include "command_executor.hpp"
-#include "command_parser.hpp"
+#include "string"
 
 class GameClient {
 
     public:
+    virtual ~GameClient() = default;
+
     virtual bool isRunning() noexcept(true) = 0;
 
     virtual void init() noexcept(false) = 0;
@@ -17,9 +17,8 @@ class GameClient {
     virtual void stop() noexcept(true) = 0;
 
     virtual void shutdown() noexcept(false) = 0;
-
 };
 
-GameClient* newGameClient() noexcept(true);
+GameClient *newGameClient(const std::string &rootDir) noexcept(true);
 
 #endif//GAME_HPP

@@ -14,6 +14,10 @@ class optional {
         ptr = t;
     }
 
+    ~optional() {
+        delete ptr;
+    }
+
     [[nodiscard]] bool is_present() const noexcept(true) {
         return ptr != nullptr;
     }
@@ -31,7 +35,6 @@ class optional {
 };
 
 template<typename T>
-
 optional<T> nullopt() {
     return optional<T>(nullptr);
 }

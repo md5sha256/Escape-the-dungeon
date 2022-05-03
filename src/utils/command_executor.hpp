@@ -8,7 +8,7 @@
 class CommandExecutor {
 
     public:
-    CommandExecutor() = default;
+    virtual ~CommandExecutor() = default;
 
     virtual std::vector<Command *> getRegisteredCommands() noexcept(true) = 0;
 
