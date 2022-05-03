@@ -12,7 +12,7 @@ class SimpleGameClient : public GameClient {
     CommandExecutor *commandExecutor = nullptr;
     CommandParser *commandParser = nullptr;
     Database *database = nullptr;
-    PlayerInfo* player = nullptr;
+    PlayerInfo *player = nullptr;
 
     bool running = false;
 
@@ -38,16 +38,23 @@ class SimpleGameClient : public GameClient {
         validateState();
         Command *echoCommand = new EchoCommand;
         Command *exitCommand = new ExitCommand(this);
+        Command *skillsCommand = new SkillCommand(this);
         commandExecutor->registerCommand(echoCommand);
         commandExecutor->registerCommand(exitCommand);
+        commandExecutor->registerCommand(skillsCommand);
     }
 
     bool awaitUserInput() {
         validateState();
         optional<CommandData> input = commandParser->processCommand();
         if (input.is_present()) {
+            CommandData commandData = *input.value();
+            if (commandData.getCommandName().empty()) {
+                printf("%s: %s\n", "Unknown command", toString(commandData.getArgs()).data());
+                return true;
+            }
             try {
-                commandExecutor->executeCommand(*player, *input.value());
+                commandExecutor->executeCommand(*player, commandData);
             } catch (CommandExecutionError &ex) {
                 printf("%s\n", "An unexpected error occurred when handling the previous command");
                 std::cerr << ex.what() << std::endl;
@@ -60,26 +67,36 @@ class SimpleGameClient : public GameClient {
     }
 
     void checkPosition() {
-        PlayerInfo p = *player;
-        while(p.position!=10){
-            if(p.path[p.position]==0){//when battle is encountered
-                vector<enemy> enemy_generated;
-                enemy_generated=generate_enemies();
+        if (player->position < 10) {
+            switch (player->path[player->position]) {
+                case 0: {
+                    std::cout << "battle placeholder" << std::endl;
+                    //when battle is encountered
+                    vector<enemy> enemy_generated = generate_enemies();
+                    break;
+                }
+                case 1: {
+                    //when campfire is encountered
+                    campfire(*player);
+                    break;
+                }
+                case 2: {
+                    // when shop is encountered
+                    std::cout << "shop placeholder" << std::endl;
+                    break;
+                }
+                case 3: {
+                    // when random event is encountered
+                    std::cout << "random event placeholder" << std::endl;
+                    break;
+                }
+                case 4: {
+                    std::cout << "boss placeholder" << std::endl;
+                    // when boss is encountered
+                    break;
+                }
             }
-            else if(p.path[p.position]==1){//when campfire is encountered
-                campfire(p);
-            }
-            else if(p.path[p.position]==2){//when shop is encountered
-
-            }
-            else if(p.path[p.position]==3){//when random event is encountered
-
-            }
-            else if(p.path[p.position]==4){//when boss is encountered
-
-            }
-
-            p.position+=1;
+            player->position += 1;
         }
     }
 
@@ -116,7 +133,7 @@ class SimpleGameClient : public GameClient {
         loadData();
         initPlayer(*player);
         while (running) {
-            if (!awaitUserInput()) {
+            if (!awaitUserInput() && running) {
                 checkPosition();
             }
         }
@@ -136,7 +153,6 @@ class SimpleGameClient : public GameClient {
     [[nodiscard]] PlayerInfo *getPlayer() const noexcept(true) override {
         return player;
     }
-
 };
 
 GameClient *newGameClient(const std::string &rootDir) noexcept(true) {

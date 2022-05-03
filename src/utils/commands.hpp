@@ -74,20 +74,22 @@ class SkillCommand : public Command {
     }
 
     ~SkillCommand() override {
-        delete gameClient;
+        gameClient = nullptr;
     }
 
     bool onCommand(PlayerInfo &player, std::vector<std::string> &args) noexcept(true) override {
-        if (toLowercase(args[0]) == "show") {
+        if (args.empty()) {
+            printUsages();
+            return false;
+        } else if (toLowercase(args[0]) == "show") {
             player.print_all_status();
             return true;
         } else if (toLowercase(args[0]) == "allocate") {
             player.allocate_sp();
             return true;
-        } else {
-            printUsages();
-            return false;
         }
+        printUsages();
+        return false;
     }
 
     void printUsages() const noexcept(true) override {
