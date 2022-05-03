@@ -4,6 +4,7 @@
 #include"start.cpp"
 #include"playerinfo.hpp"
 #include"battle.cpp"
+#include"campfire.cpp"
 
 using namespace std;
 
