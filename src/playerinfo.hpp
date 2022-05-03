@@ -170,11 +170,26 @@ struct shop_item{
 	int price;
 };
 
+struct enemy{
+	string name;
+	int attack;
+	int defence;
+	int hp;
+	
+	void enemy_generation(){
+		srand(time(NULL));
+		name=(rand()%5)+10;
+		attack=(rand()%5)+1;
+		defence=(rand()%5)+1;
+		hp=(rand()%4)+1;
+	}
+};
 
 void start(player_info &p);
 void fight(player_info p);
 void campfire(player_info p);
 void shop(player_info p,vector<shop_item> goods);
+vector<enemy> generate_enemies();
 void random_event(player_info p);
 void boss(player_info p);
 
