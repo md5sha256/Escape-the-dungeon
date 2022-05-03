@@ -3,6 +3,7 @@
 #include<string>
 #include"start.cpp"
 #include"playerinfo.hpp"
+#include"battle.cpp"
 
 using namespace std;
 
