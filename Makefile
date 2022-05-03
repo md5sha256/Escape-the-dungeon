@@ -1,23 +1,28 @@
 SHELL=bash
 FLAGS = -pedantic-errors -std=c++11
-_UTILS = $(wildcard src/utils)
-UTILS = $(wildcard $(_UTILS)/*.cpp)
+SDIR = src
+UTILS = $(SDIR)/utils
+OBJECTS =
 
 all: game
-	cp game.o $@.o
+	cp $<.o $@.o
 
 # FIXME: this target
-game: $(UTILS) $(wildcard src/*.cpp)
+game: $(wildcard $(SDIR)/*.cpp) $(wildcard $(UTILS)/*.cpp)
 	g++ $(FLAGS) $^ -o $@.o
 
-demo:  $(UTILS) src/demo.cpp
-	g++ $(FLAGS)  $^ -g -o $@.o
+demo: src/demo.cpp $(UTILS)
+	g++ $(FLAGS) $< -o $@.o
 
-main: $(UTILS) src/main.cpp
-	g++ $(FLAGS) $^ -g -o $@.o
+main: src/main.cpp $(UTILS)
+	g++ $(FLAGS) $^ -o $@.o
 
 clean:
 	rm -f *.o
 
 .PHONY:
 	clean
+
+.SILENT:
+	clean
+	all
