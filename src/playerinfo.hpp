@@ -187,11 +187,11 @@ struct enemy{
 
 void start(player_info &p);
 void fight(player_info p);
-void campfire(player_info p);
 void shop(player_info p,vector<shop_item> goods);
 vector<enemy> generate_enemies();
 void random_event(player_info p);
 void boss(player_info p);
+void campfire(player_info &p);
 
 
 #endif//PLAYERINFO_HPP

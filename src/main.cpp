@@ -1,9 +1,9 @@
 #include<iostream>
 #include<algorithm>
 #include<string>
-#include"start.cpp"
 #include"playerinfo.hpp"
-#include"battle.cpp"
+#include"start.hpp"
+#include"campfire.hpp"
 
 using namespace std;
 

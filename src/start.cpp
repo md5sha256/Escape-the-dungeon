@@ -1,9 +1,9 @@
+#include"start.hpp"
 #include<iostream>
 #include<string>
-#include"playerinfo.hpp"
 using namespace std;
 
-void start(player_info &p){
+void start(player_info &p) {
 	cout<<"Please enter your name: ";
 	cin>>p.name;
 	string input;

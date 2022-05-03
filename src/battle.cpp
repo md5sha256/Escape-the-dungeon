@@ -1,8 +1,4 @@
-#include<iostream>
-#include<string>
-#include<cstdlib>
-#include<ctime>
-#include'playerinfo.hpp'
+#include"battle.hpp"
 using namespace std;
 
 vector<enemy> generate_enemies(){
