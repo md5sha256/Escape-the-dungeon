@@ -233,5 +233,9 @@ vector<enemy> generate_enemies();
 void random_event(player_info &p);
 void boss(player_info p);
 void campfire(player_info &p);
+void event1(player_info &p);
+void event2(player_info &p);
+void event3(player_info &p);
+void event4(player_info &p);
 
 #endif//PLAYERINFO_HPP
