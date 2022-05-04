@@ -97,6 +97,28 @@ struct player_info {
             } else
                 cout << "Please enter a valid number." << endl;
         }
+        
+        
+        bool check_if_dead(){
+		if(hp<=0){
+			return true;
+		}
+		else
+		return false;
+	}
+	
+	void take_damage(int damage){
+		if (defence>0 && defence >=damage){
+			defence-=damage;
+		}
+		else if (defence>0 && defence <= damage){
+			damage-=defence;
+			defence=0;
+			hp-=damage;
+		}
+		else
+		hp-=damage;
+	}
     }
 
     void generate_in_hand_cards() {
@@ -157,26 +179,58 @@ struct shop_item {
     int price;
 };
 
-struct enemy {
-    string name;
-    int attack;
-    int defence;
-    int hp;
-
-    void enemy_generation() {
-        srand(time(NULL));
-        name = (rand() % 5) + 10;
-        attack = (rand() % 5) + 1;
-        defence = (rand() % 5) + 1;
-        hp = (rand() % 4) + 1;
-    }
+struct enemy{
+	string name;
+	int attack;
+	int defence;
+	int hp;
+	
+	void enemy_generation(){
+		srand(time(NULL));
+		attack=(rand()%5)+1;
+		defence=(rand()%5)+1;
+		hp=(rand()%4)+1;
+		//naming of enemy
+		if ((attack+defence)>=8)//powerful enemy
+		name="Elite ";
+		else if ((attack+defence)>=5)//strong enemy
+		name="Adult ";
+		else//weak enemy
+		name="Baby";
+		if (defence*2<=attack)//if attack is twice as great as defence
+		name+="Zombie";
+		else if (attack*2<=defence)//if defence is twice as great as attack
+		name+="Skeleton";
+		else//if somewhere balance
+		name+="Shrem";
+	}
+	
+	bool check_if_dead(){
+		if(hp<=0){
+			return true;
+		}
+		else
+		return false;
+	}
+	
+	void enemy_take_damage(int damage){
+		if (defence>0 && defence >=damage){
+			defence-=damage;
+		}
+		else if (defence>0 && defence <= damage){
+			damage-=defence;
+			defence=0;
+			hp-=damage;
+		}
+		else
+		hp-=damage;
+	}
 };
 
 void initPlayer(player_info &p);
-void fight(player_info p);
 void shop(player_info p, vector<shop_item> goods);
 vector<enemy> generate_enemies();
-void random_event(player_info p);
+void random_event(player_info &p);
 void boss(player_info p);
 void campfire(player_info &p);
 
