@@ -172,12 +172,22 @@ struct path {
     }
 };
 
-struct shop_item {
-    string name;
-    string effect;
-    int type;
-    int price;
+struct shop_item{
+	int card_id;
+	int gold_cost;
 };
+
+
+vector<shop_item> generate_shop_item(){
+	vector<shop_item> item;
+	for (int i=4;i<10;i++){
+		shop_item temp;
+		temp.card_id=i;
+		temp.gold_cost=(rand()%40)+20;//cost of cards varies each time;
+		item.push_back(temp);
+	}
+	return item;
+}
 
 struct enemy{
 	string name;
