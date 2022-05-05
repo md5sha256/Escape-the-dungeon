@@ -49,7 +49,7 @@ class SimpleExecutor : public CommandExecutor {
         return true;
     }
 
-    bool executeCommand(PlayerInfo &player, const CommandData &data) noexcept(false) override {
+    bool executeCommand(Player &player, const CommandData &data) noexcept(false) override {
         optional<Command> optionalCmd = findCommand(data.getCommandName());
         if (optionalCmd.is_empty()) {
             return false;

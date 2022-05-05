@@ -52,11 +52,12 @@ class JsonDatabase : public Database {
         return member;
     }
 
-    void saveCards(rapidjson::Document &document, const vector<Card *> &cards, const char *key) {
+    void saveCards(rapidjson::Document &document, const std::vector<Card *> &cards, const char *key) {
         rapidjson::Value value;
         for (int i = 0; i < cards.size(); i++) {
             rapidjson::Value member = serialize_card(cards[i]);
-            const char *index = to_string(i).c_str();
+            std::string s = std::to_string(i);
+            const char *index = s.c_str();
             value[index] = member;
         }
         document[key] = value;
@@ -100,7 +101,7 @@ class JsonDatabase : public Database {
         return Card{cardId, templateId, intAttributes, doubleAttributes, stringAttributes};
     }
 
-    vector<Card *> loadCards(rapidjson::Document &document, const char *key) {
+    std::vector<Card *> loadCards(rapidjson::Document &document, const char *key) {
         if (!document.IsObject()) {
             return {};
         }
@@ -117,7 +118,7 @@ class JsonDatabase : public Database {
                 max = index;
             }
         }
-        auto ret = vector<Card *>(max);
+        auto ret = std::vector<Card *>(max);
         for (auto pair : cards) {
             ret.at(pair.first) = pair.second;
         }
@@ -131,7 +132,7 @@ class JsonDatabase : public Database {
     ~JsonDatabase() = default;
 
     void load(const std::string &path) noexcept(false) override {
-        ifstream databaseFile;
+        std::ifstream databaseFile;
         databaseFile.open(path + CARD_DATABASE, std::ios::in | std::ios::ate);
         rapidjson::IStreamWrapper databaseWrapper(databaseFile);
         rapidjson::Document cards;
@@ -146,7 +147,7 @@ class JsonDatabase : public Database {
     void save(const std::string &path) noexcept(false) override {
         rapidjson::Document cards;
         saveCards(cards);
-        ofstream databaseFile;
+        std::ofstream databaseFile;
         databaseFile.open(path + CARD_DATABASE, std::ios::out | std::ios::trunc);
         rapidjson::OStreamWrapper databaseWrapper(databaseFile);
         rapidjson::Writer<rapidjson::OStreamWrapper> writer(databaseWrapper);

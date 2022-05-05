@@ -11,7 +11,8 @@ class SimpleGameClient : public GameClient {
     CommandExecutor *commandExecutor = nullptr;
     CommandParser *commandParser = nullptr;
     Database *database = nullptr;
-    PlayerInfo *player = nullptr;
+    Player *player = nullptr;
+    //BattleHandler *battleHandler = nullptr;
 
     bool running = false;
 
@@ -25,7 +26,8 @@ class SimpleGameClient : public GameClient {
 
     void loadData() noexcept(false) {
         validateState();
-        player = new PlayerInfo;
+        Player temp = initPlayer();
+        player = &temp;
         std::cout << "Loading data..." << std::endl;
         database->load();
         std::cout << "Data loading complete!" << std::endl;
@@ -35,7 +37,7 @@ class SimpleGameClient : public GameClient {
         validateState();
         Command *echoCommand = new EchoCommand;
         Command *exitCommand = new ExitCommand(this);
-        Command *skillsCommand = new SkillCommand(this);
+        Command *skillsCommand = new SkillCommand;
         commandExecutor->registerCommand(echoCommand);
         commandExecutor->registerCommand(exitCommand);
         commandExecutor->registerCommand(skillsCommand);
@@ -64,12 +66,10 @@ class SimpleGameClient : public GameClient {
     }
 
     void checkPosition() {
-        if (player->position < 10) {
-            switch (player->path[player->position]) {
+        if (player->getPosition() < 10) {
+            switch (player->getPathAtPosition()) {
                 case 0: {
                     std::cout << "battle placeholder" << std::endl;
-                    //when battle is encountered
-                    vector<enemy> enemy_generated = generate_enemies();
                     break;
                 }
                 case 1: {
@@ -93,7 +93,7 @@ class SimpleGameClient : public GameClient {
                     break;
                 }
             }
-            player->position += 1;
+            player->incrementPosition();
         }
     }
 
@@ -105,6 +105,8 @@ class SimpleGameClient : public GameClient {
     ~SimpleGameClient() override {
         delete commandExecutor;
         delete commandParser;
+        //delete battleHandler;
+        delete player;
     }
 
     bool isRunning() noexcept(true) override {
@@ -117,6 +119,7 @@ class SimpleGameClient : public GameClient {
         }
         commandExecutor = newCmdExecutor();
         commandParser = newCmdParser();
+        //battleHandler = new BattleHandler;
         database = newDatabase(dataDir);
     }
 
@@ -128,7 +131,6 @@ class SimpleGameClient : public GameClient {
 
         registerCommands();
         loadData();
-        initPlayer(*player);
         while (running) {
             if (!awaitUserInput() && running) {
                 checkPosition();
@@ -147,9 +149,16 @@ class SimpleGameClient : public GameClient {
         stop();
     }
 
-    [[nodiscard]] PlayerInfo *getPlayer() const noexcept(true) override {
+    [[nodiscard]] Player *getPlayer() const noexcept(true) override {
         return player;
     }
+
+    /*
+    [[nodiscard]] BattleHandler *getBattleHandler() const noexcept(true) override {
+        return battleHandler;
+    }
+    */
+
 };
 
 GameClient *newGameClient(const std::string &rootDir) noexcept(true) {

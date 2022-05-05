@@ -8,9 +8,6 @@
 
 class CommandExecutor {
 
-    protected:
-    typedef player_info PlayerInfo;
-
     public:
     virtual ~CommandExecutor() = default;
 
@@ -20,7 +17,7 @@ class CommandExecutor {
 
     virtual bool registerCommand(Command *command) noexcept(false) = 0;
 
-    virtual bool executeCommand(PlayerInfo &player, const CommandData &command) noexcept(false) = 0;
+    virtual bool executeCommand(Player &player, const CommandData &command) noexcept(false) = 0;
 };
 
 CommandExecutor* newCmdExecutor();

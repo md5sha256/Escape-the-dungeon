@@ -1,13 +1,10 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "string"
 #include "../playerinfo.hpp"
+#include "string"
 
 class GameClient {
-
-    protected:
-    typedef player_info PlayerInfo;
 
     public:
     virtual ~GameClient() = default;
@@ -22,7 +19,9 @@ class GameClient {
 
     virtual void shutdown() noexcept(false) = 0;
 
-    [[nodiscard]] virtual PlayerInfo *getPlayer() const noexcept(true) = 0;
+    [[nodiscard]] virtual Player *getPlayer() const noexcept(true) = 0;
+
+    //[[nodiscard]] virtual BattleHandler *getBattleHandler() const noexcept(true) = 0;
 
 };
 

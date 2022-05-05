@@ -1,69 +1,74 @@
 #include "start.hpp"
 #include <iostream>
 #include <string>
-using namespace std;
 
-void initPlayer(player_info &p) {
-    cout << "Please enter your name: ";
-    cin >> p.name;
-    string input;
-    cout << "Please allocate your skill points:" << endl;
-    p.allocate_sp();
-    path g;
+Player initPlayer() {
+    std::string name;
+    std::cout << "Please enter your name: ";
+    std::cin >> name;
+    std::string input;
+    std::cout << "Please allocate your skill points:" << std::endl;
+    Player player(name);
+    allocateSkillPoints(player);
+    Path g;
     g.generate();
-    cout << "Please select your path to the entrance." << endl;
-    cout << "Path 1:" << endl;
+    std::cout << "Please select your path to the entrance." << std::endl;
+    std::cout << "Path 1:" << std::endl;
     for (int i = 0; i < 10; i++) {
         if (g.path1[i] == 0)
-            cout << "Battle>>";
+            std::cout << "Battle>>";
         if (g.path1[i] == 1)
-            cout << "Campfire>>";
+            std::cout << "Campfire>>";
         if (g.path1[i] == 2)
-            cout << "Shop>>";
+            std::cout << "Shop>>";
         if (g.path1[i] == 3)
-            cout << "Event>>";
+            std::cout << "Event>>";
         if (g.path1[i] == 4)
-            cout << "Boss>>Escape" << endl;
+            std::cout << "Boss>>Escape" << std::endl;
     }
-    cout << "Path 2:" << endl;
+    std::cout << "Path 2:" << std::endl;
     for (int i = 0; i < 10; i++) {
         if (g.path2[i] == 0)
-            cout << "Battle>>";
+            std::cout << "Battle>>";
         if (g.path2[i] == 1)
-            cout << "Campfire>>";
+            std::cout << "Campfire>>";
         if (g.path2[i] == 2)
-            cout << "Shop>>";
+            std::cout << "Shop>>";
         if (g.path2[i] == 3)
-            cout << "Event>>";
+            std::cout << "Event>>";
         if (g.path2[i] == 4)
-            cout << "Boss>>Escape" << endl;
+            std::cout << "Boss>>Escape" << std::endl;
     }
-    cout << "Path 3:" << endl;
+    std::cout << "Path 3:" << std::endl;
     for (int i = 0; i < 10; i++) {
         if (g.path3[i] == 0)
-            cout << "Battle>>";
+            std::cout << "Battle>>";
         if (g.path3[i] == 1)
-            cout << "Campfire>>";
+            std::cout << "Campfire>>";
         if (g.path3[i] == 2)
-            cout << "Shop>>";
+            std::cout << "Shop>>";
         if (g.path3[i] == 3)
-            cout << "Event>>";
+            std::cout << "Event>>";
         if (g.path3[i] == 4)
-            cout << "Boss>>Escape" << endl;
+            std::cout << "Boss>>Escape" << std::endl;
     }
-    cout << "Enter a path number: ";
-    cin >> input;
-    while (p.path.size() == 0) {
+    std::cout << "Enter a path number: ";
+    std::cin >> input;
+    std::vector<int> playerPath;
+    while (true) {
         if (input == "1")
-            p.path = g.path1;
+            playerPath = g.path1;
         else if (input == "2")
-            p.path = g.path2;
+            playerPath = g.path2;
         else if (input == "3")
-            p.path = g.path3;
+            playerPath = g.path3;
         else {
-            cout << "Please enter a valid number!" << endl;
-            return;
+            std::cout << "Please enter a valid number!" << std::endl;
+            continue;
         }
-        cout << "You have chosen path " << input << std::endl;
+        std::cout << "You have chosen path " << input << std::endl;
+        break;
     }
+    player.setPath(playerPath);
+    return player;
 }

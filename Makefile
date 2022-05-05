@@ -4,14 +4,14 @@ SDIR = src
 UTILS = $(SDIR)/utils
 INC = include/
 
-all: $(wildcard $(SDIR)/*.cpp) $(wildcard $(UTILS)/*.cpp)
+all: src/playerinfo.hpp $(wildcard $(SDIR)/*.cpp) $(wildcard $(UTILS)/*.cpp)
 	g++ $(FLAGS) -I$(INC) $^ -o $@.o
 
 # FIXME: this target
-game1: $(wildcard $(SDIR)/*.cpp) $(wildcard $(UTILS)/*.cpp)
+game: src/playerinfo.hpp $(wildcard $(SDIR)/*.cpp) $(wildcard $(UTILS)/*.cpp)
 	g++ $(FLAGS) $^ -o $@.o
 
-demo:  $(wildcard $(SDIR)/*.cpp) $(wildcard $(UTILS)/*.cpp)
+demo: src/playerinfo.hpp $(wildcard $(SDIR)/*.cpp) $(wildcard $(UTILS)/*.cpp)
 	g++ $(FLAGS) -I$(INC) $^ -g -o $@.o
 
 clean:

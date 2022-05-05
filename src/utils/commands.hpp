@@ -12,7 +12,7 @@ class EchoCommand : public Command {
     EchoCommand() : Command("echo") {
     }
 
-    bool onCommand(PlayerInfo &player, std::vector<std::string> &args) noexcept(true) override {
+    bool onCommand(Player &player, std::vector<std::string> &args) noexcept(true) override {
         for (const std::string &s : args) {
             std::cout << s << " ";
         }
@@ -35,7 +35,7 @@ class ExitCommand : public Command {
         gameClient = nullptr;
     }
 
-    bool onCommand(PlayerInfo &player, std::vector<std::string> &args) noexcept(true) override {
+    bool onCommand(Player &player, std::vector<std::string> &args) noexcept(true) override {
         std::cout << "Are you sure you want to exit the game? (y/n)" << std::endl;
         std::string input;
         std::cin >> input;
@@ -57,8 +57,6 @@ class ExitCommand : public Command {
 
 class SkillCommand : public Command {
 
-    GameClient *gameClient;
-
     static std::string printUsage(const std::string &cmd) {
         if (cmd == "show") {
             return "/skills show (show the current skills and available points)";
@@ -69,23 +67,19 @@ class SkillCommand : public Command {
     }
 
     public:
-    explicit SkillCommand(GameClient *client) : Command("skills") {
-        gameClient = client;
+    explicit SkillCommand() : Command("skills") {
     }
 
-    ~SkillCommand() override {
-        gameClient = nullptr;
-    }
 
-    bool onCommand(PlayerInfo &player, std::vector<std::string> &args) noexcept(true) override {
+    bool onCommand(Player &player, std::vector<std::string> &args) noexcept(true) override {
         if (args.empty()) {
             printUsages();
             return false;
         } else if (toLowercase(args[0]) == "show") {
-            player.print_all_status();
+            player.printStatus();
             return true;
         } else if (toLowercase(args[0]) == "allocate") {
-            player.allocate_sp();
+            allocateSkillPoints(player);
             return true;
         }
         printUsages();

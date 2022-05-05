@@ -54,9 +54,6 @@ struct CommandExecutionError : std::runtime_error {
 
 class Command {
 
-    protected:
-    typedef player_info PlayerInfo;
-
     private:
     /**
      * Name of the command
@@ -76,7 +73,9 @@ class Command {
      * @param args The arguments in the order they were passed
      * @return Return true if the command was executed successfully, false otherwise
      */
-    virtual bool onCommand(PlayerInfo &player, std::vector<std::string> &args) noexcept(false) = 0;
+    virtual bool onCommand(Player &player, std::vector<std::string> &args) noexcept(false) {
+        return true;
+    }
 
     virtual void printUsages() const noexcept(true) {
 
@@ -86,7 +85,7 @@ class Command {
         return std::string{name};
     }
 
-    static void printLines(const vector<string> &messages) {
+    static void printLines(const std::vector<std::string> &messages) {
         for (const std::string& msg : messages) {
             if (!msg.empty()) {
                 std::cout << msg << std::endl;

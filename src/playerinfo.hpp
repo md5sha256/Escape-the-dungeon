@@ -5,137 +5,312 @@
 #include <iostream>
 #include <string>
 #include <vector>
-using namespace std;
+#include <map>
+#include "utils/optional.hpp"
 
-struct player_info {
-    string name;
-    int hp = 10;
-    int attack = 1;
-    int defence = 0;
-    int spirit = 3;
+struct Card {
+
+    private:
+    int id;
+
+    int templateId;
+
+    std::map<const std::string, int> intAttributes;
+    std::map<const std::string, double> doubleAttributes;
+    std::map<const std::string, std::string> stringAttributes;
+
+    template<typename T>
+    [[nodiscard]] static optional<T> getAttribute(const std::string &key, const std::map<const std::string, T> map) {
+        auto iter = map.find(key);
+        if (iter != map.end()) {
+            auto value = iter->second;
+            return optional<T>(&value);
+        }
+        return nullopt<T>();
+    }
+
+    public:
+    Card(const int cardId, const int cardTemplateId) {
+        id = cardId;
+        templateId = cardTemplateId;
+    }
+
+    Card(int cardId, int cardTemplateId,
+         const std::map<const std::string, int> &ints,
+         const std::map<const std::string, double> &doubles,
+         const std::map<const std::string, std::string> &strings) : Card(cardId, cardTemplateId) {
+        intAttributes = ints;
+        doubleAttributes = doubles;
+        stringAttributes = strings;
+    }
+
+    [[nodiscard]] int getTemplateId() const {
+        return templateId;
+    }
+
+    [[nodiscard]] int getId() const {
+        return id;
+    }
+
+    [[nodiscard]] optional<int> getIntAttribute(const std::string &key) const {
+        return getAttribute<int>(key, intAttributes);
+    }
+
+    [[nodiscard]] optional<double> getDoubleAttribute(const std::string &key) const {
+        return getAttribute<double>(key, doubleAttributes);
+    }
+
+    [[nodiscard]] optional<std::string> getStringAttribute(const std::string &key) const {
+        return getAttribute<std::string>(key, stringAttributes);
+    }
+
+    void setIntAttribute(const std::string &key, const int &value) {
+        intAttributes[key] = value;
+    }
+
+    void setDoubleAttribute(const std::string &key, const double &value) {
+        doubleAttributes[key] = value;
+    }
+
+    void setStringAttribute(const std::string &key, const std::string &value) {
+        stringAttributes[key] = value;
+    }
+
+    [[nodiscard]] std::map<const std::string, int> getIntAttributes() const {
+        return std::map<const std::string, int>{intAttributes};
+    }
+
+    [[nodiscard]] std::map<const std::string, double> getDoubleAttributes() const {
+        return std::map<const std::string, double>{doubleAttributes};
+    }
+
+    [[nodiscard]] std::map<const std::string, std::string> getStringAttributes() const {
+        return std::map<const std::string, std::string>{stringAttributes};
+    }
+
+};
+
+struct Entity {
+
+    public:
+    enum Attribute {
+
+        HEALTH,
+        ATTACK,
+        DEFENCE,
+
+    };
+
+    static std::string getAttributeName(const Attribute &attr) {
+        switch(attr) {
+            case HEALTH: return "HP";
+            case ATTACK: return "Attack";
+            case DEFENCE: return "Defence";
+            default:
+                throw std::invalid_argument("Unknown attribute!");
+        }
+    }
+
+    static Attribute getAttribute(const std::string &raw) {
+        if (raw == "HP") {
+            return Attribute::HEALTH;
+        } else if (raw == "Attack") {
+            return Attribute::ATTACK;
+        } else if (raw == "Defence") {
+            return Attribute::DEFENCE;
+        }
+        throw std::invalid_argument("Unknown attribute: " + raw);
+    }
+
+    private:
+    std::string name;
+    std::map<Attribute, int> attributes;
+
+
+    public:
+    Entity(const std::string &_name, const std::map<Attribute, int> &attrs) {
+        name = _name;
+        attributes = attrs;
+    }
+
+    std::string getName() noexcept {
+        return name;
+    }
+
+    [[nodiscard]] int getAttribute(const Attribute attribute) {
+        return attributes[attribute];
+    }
+
+    void modifyAttribute(const Attribute attribute, const int &amt) {
+        attributes[attribute] += amt;
+        if (attributes[attribute] < 0) {
+            attributes[attribute] = 0;
+        }
+    }
+
+    void printAHD() {
+        std::cout << "HP: " << getAttribute(HEALTH) << std::endl;
+        std::cout << "Attack: " << getAttribute(ATTACK) << std::endl;
+        std::cout << "Defence: " << getAttribute(DEFENCE) << std::endl;
+    }
+
+    bool check_if_dead() {
+        return getAttribute(HEALTH) <= 0;
+    }
+
+    void take_damage(int damage){
+        int defence = getAttribute(DEFENCE);
+        // Use up the defence points first
+        modifyAttribute(DEFENCE, -damage);
+        // Min value for all attributes is 0
+        if (defence < damage) {
+            // We deal the overflow to the health
+            int healthDmg = damage - defence;
+            modifyAttribute(HEALTH, -healthDmg);
+        }
+    }
+
+};
+
+struct Player : public Entity {
+
+    private:
     int skill_points = 5;
     int gold = 0;
-    vector<int> inventory_cards = {0, 0, 0, 1, 1, 2, 2, 2, 3, 3};
-    vector<int> in_hand_cards;
-    vector<int> path;
-    vector<int> bagpack;
+    std::vector<int> path;
     int position = 0;
+    std::vector<Card*> currentDeck;
+    std::vector<Card*> inventory;
 
-    void print_ahs() {
-        cout << "HP: " << hp << endl;
-        cout << "Attack: " << attack << endl;
-        cout << "Spirit: " << spirit << endl;
+    public:
+    explicit Player(const std::string &name) : Entity(name, {{HEALTH, 10}, {ATTACK, 1}, {DEFENCE, 0}}) {
     }
 
-    void print_all_status() {
-        print_ahs();
-        cout << "Spirit: " << spirit << endl;
-        cout << "skill_points: " << skill_points << endl;
+    std::vector<Card*> getCurrentDeck() {
+        return currentDeck;
     }
 
-    void print_in_hand_cards() {
-        for (int i = 0; i < in_hand_cards.size(); i++) {
-            cout << in_hand_cards[i] << " ";
+    std::vector<Card*> getInventory() {
+        return inventory;
+    }
+
+    void setPath(std::vector<int> &_path) noexcept(true) {
+        path = _path;
+    }
+
+    [[nodiscard]] int getSkillPoints() const {
+        return skill_points;
+    }
+
+    void modifySkillPoints(const int &amt) {
+        skill_points += amt;
+        if (skill_points < 0) {
+            skill_points = 0;
         }
     }
 
-    void print_inventory_cards() {
-        for (int i = 0; i < inventory_cards.size(); i++) {
-            cout << inventory_cards[i] << " ";
+    [[nodiscard]] int getGold() const noexcept(true) {
+        return gold;
+    }
+
+    void modifyGold(int amount) noexcept(true) {
+        gold += amount;
+        if (gold < 0) {
+            gold = 0;
         }
+    }
+
+    [[nodiscard]] int getPosition() const noexcept(true) {
+        return position;
+    }
+
+    [[nodiscard]] int getPathAtPosition() const noexcept(true) {
+        return path[position];
+    }
+
+    void incrementPosition() noexcept(true) {
+        if (position < path.size()) {
+            position++;
+        }
+    }
+
+    int modifyPosition(const int &amt) noexcept(true) {
+        position += amt;
+        if (position > path.size() - 1) {
+            position = (int) path.size() - 1;
+        } else if (position < 0) {
+            position = 0;
+        }
+        return position;
+    }
+
+
+    void printStatus() {
+        printAHD();
+        std::cout << "Skill Points: " << skill_points << std::endl;
     }
 
     void print_map() {
         for (int i = 0; i < 10; i++) {
             if (i != position) {
                 if (path[i] == 0)
-                    cout << "Battle>>";
+                    std::cout << "Battle >> ";
                 else if (path[i] == 1)
-                    cout << "Campfire>>";
+                    std::cout << "Campfire >> ";
                 else if (path[i] == 2)
-                    cout << "Shop>>";
+                    std::cout << "Shop >> ";
                 else if (path[i] == 3)
-                    cout << "Event>>";
+                    std::cout << "Event >> ";
                 else
-                    cout << "Boss>>";
+                    std::cout << "Boss>>";
             } else {//highlight the current postion of player on map
                 if (path[i] == 0)
-                    cout << "**Battle**>>";
+                    std::cout << "**Battle** >> ";
                 else if (path[i] == 1)
-                    cout << "**Campfire**>>";
+                    std::cout << "**Campfire** >> ";
                 else if (path[i] == 2)
-                    cout << "**Shop**>>";
+                    std::cout << "**Shop** >> ";
                 else if (path[i] == 3)
-                    cout << "**Event**>>";
+                    std::cout << "**Event** >> ";
                 else
-                    cout << "**Boss**>>";
+                    std::cout << "**Boss** >> ";
             }
         }
-        cout << "Escape" << endl;//print the final station on the map
-    }
-    void allocate_sp() {
-        string input;
-        cout << "You have " << skill_points << " skill points at the moment" << endl;
-        cout << "You can boost either your 'Attack', 'HP' or 'Spirit'." << endl;
-        while (skill_points != 0) {
-            cout << "Input a number(1: Attack, 2: HP, 3: Spirit): ";
-            cin >> input;
-            if (input == "1") {
-                attack += 1;
-                skill_points -= 1;
-                print_ahs();
-            } else if (input == "2") {
-                hp += 1;
-                skill_points -= 1;
-                print_ahs();
-            } else if (input == "3") {
-                spirit += 1;
-                skill_points -= 1;
-                print_ahs();
-            } else if (input == "quit") {
-                break;
-            } else
-                cout << "Please enter a valid number." << endl;
-        }
-    }
-        
-        
-    bool check_if_dead() {
-        if (hp <= 0) {
-            return true;
-        } else
-            return false;
-    }
-	
-	void take_damage(int damage){
-		if (defence>0 && defence >=damage){
-			defence-=damage;
-		}
-		else if (defence>0 && defence <= damage){
-			damage-=defence;
-			defence=0;
-			hp-=damage;
-		}
-		else
-		hp-=damage;
+        std::cout << "Escape" << std::endl;//print the final station on the map
     }
 
-    void generate_in_hand_cards() {
-        srand(time(NULL));
-        for (int i = 0; i < 5; i++) {                   //total of 5 cards should be generated
-            int j = rand() % (inventory_cards.size());  //find a random index in inventory cards
-            in_hand_cards.push_back(inventory_cards[j]);//use the index to find the specific card generated
+    void addSkillPoints(const int &amt) {
+        if (amt < 0) {
+            throw std::invalid_argument("amount cannot be negative!");
+        }
+        skill_points += amt;
+    }
+
+    void removeSkillPoints(const int &amt) {
+        if (amt < 0) {
+            throw std::invalid_argument("amount cannot be negative!");
+        }
+        skill_points += amt;
+        if (skill_points < 0) {
+            skill_points = 0;
+        }
+    }
+
+    void printUnallocatedSkillPoints() const {
+        std::cout << "You have " << skill_points << " skill unallocated points at the moment" << std::endl;
+        if (skill_points > 0) {
+            std::cout << "You can boost either your 'Attack', 'HP' or 'Defence'." << std::endl;
         }
     }
 };
 
-struct path {
-    vector<int> path1;
-    vector<int> path2;
-    vector<int> path3;
+struct Path {
+    std::vector<int> path1;
+    std::vector<int> path2;
+    std::vector<int> path3;
     //path id: 0 for battle,1 for campfire, 2 for shop,3 for random event
     void generate() {
-        srand(time(NULL) + 1);
+        srand(time(nullptr) + 1);
         path1.push_back(0);          //player should encounter battle at the beginning of each path, for earning enough money to buy stuff in shop
         for (int i = 0; i < 8; i++) {//generate the first path
             int j = rand() % 5;
@@ -145,7 +320,7 @@ struct path {
             } else
                 path1.push_back(0);
         }
-        srand(time(NULL) + 2);
+        srand(time(nullptr) + 2);
         path2.push_back(0);          //player should encounter battle at the beginning of each path, for earning enough money to buy stuff in shop
         for (int i = 0; i < 8; i++) {//generate the second path
             int j = rand() % 5;
@@ -171,82 +346,58 @@ struct path {
     }
 };
 
-struct shop_item{
-	int card_id;
-	int gold_cost;
-    shop_item(int cardId, int cost) {
-        card_id = cardId;
-        gold_cost = cost;
-    }
-};
 
-
-inline vector<shop_item> generate_shop_item(){
-	vector<shop_item> item;
-	for (int i=4;i<10;i++){
-		const shop_item temp(i, (rand() % 40) + 20); //cost of cards varies each time;
-		item.push_back(temp);
-	}
-	return item;
+inline Entity generateRandomEnemy() {
+    typedef Entity::Attribute Attribute;
+    int attack = (rand() % 5) + 1;
+    int defence = (rand() % 5) + 1;
+    int hp = (rand() % 4) + 1;
+    std::string name;
+    //naming of enemy
+    if ((attack + defence) >= 8)//powerful enemy
+        name = "Elite ";
+    else if ((attack + defence) >= 5)//strong enemy
+        name = "Adult ";
+    else//weak enemy
+        name = "Baby";
+    if (defence * 2 <= attack)//if attack is twice as great as defence
+        name += "Zombie";
+    else if (attack * 2 <= defence)//if defence is twice as great as attack
+        name += "Skeleton";
+    else//if somewhere balance
+        name += "Shrem";
+    std::map<Attribute, int> attrs = {{Attribute::HEALTH, hp}, {Attribute::ATTACK, attack}, {Attribute ::DEFENCE, defence}};
+    return Entity{name, attrs};
 }
 
-struct enemy{
-	string name;
-	int attack;
-	int defence;
-	int hp;
-	
-	void enemy_generation(){
-		srand(time(NULL));
-		attack=(rand()%5)+1;
-		defence=(rand()%5)+1;
-		hp=(rand()%4)+1;
-		//naming of enemy
-		if ((attack+defence)>=8)//powerful enemy
-		name="Elite ";
-		else if ((attack+defence)>=5)//strong enemy
-		name="Adult ";
-		else//weak enemy
-		name="Baby";
-		if (defence*2<=attack)//if attack is twice as great as defence
-		name+="Zombie";
-		else if (attack*2<=defence)//if defence is twice as great as attack
-		name+="Skeleton";
-		else//if somewhere balance
-		name+="Shrem";
-	}
-	
-	bool check_if_dead(){
-		if(hp<=0){
-			return true;
-		}
-		else
-		return false;
-	}
-	
-	void enemy_take_damage(int damage){
-		if (defence>0 && defence >=damage){
-			defence-=damage;
-		}
-		else if (defence>0 && defence <= damage){
-			damage-=defence;
-			defence=0;
-			hp-=damage;
-		}
-		else
-		hp-=damage;
-	}
-};
+inline void allocateSkillPoints(Player &player) {
+    typedef Entity::Attribute Attribute;
+    player.printUnallocatedSkillPoints();
+    std::string input;
+    while (player.getSkillPoints() > 0) {
+        std::cout << "Input a number(1: Attack, 2: HP, 3: Defence): ";
+        std::cin >> input;
+        Attribute toModify;
+        if (input == "1") {
+            toModify = Attribute::ATTACK;
+        } else if (input == "2") {
+            toModify = Attribute::HEALTH;
+        } else if (input == "3") {
+            toModify = Attribute ::DEFENCE;
+        } else if (input == "quit") {
+            break;
+        } else {
+            std::cout << "Please enter a valid number." << std::endl;
+            continue;
+        }
+        player.modifyAttribute(toModify, 1);
+        player.modifySkillPoints(-1);
+    }
+}
 
-void initPlayer(player_info &p);
-void shop(player_info p, vector<shop_item> goods);
-vector<enemy> generate_enemies();
-void random_event(player_info &p);
-void boss(player_info p);
-void campfire(player_info &p);
-void event1(player_info &p);
-void event2(player_info &p);
-void event3(player_info &p);
-void event4(player_info &p);
+Player initPlayer();
+void random_event(Player &p);
+void boss(Player p);
+void campfire(Player &p);
 
 #endif//PLAYERINFO_HPP

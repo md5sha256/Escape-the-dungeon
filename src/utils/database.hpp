@@ -1,6 +1,7 @@
 #ifndef DATABASE_HPP
 #define DATABASE_HPP
 
+#include "../playerinfo.hpp"
 #include "card.hpp"
 #include "fstream"
 #include "registry.cpp"
@@ -14,13 +15,13 @@ class Database {
     std::string root;
 
     Registry<int, CardTemplate *> *templates;
-    vector<Card *> *cardInventory;
-    vector<Card *> *cardDeck;
+    std::vector<Card *> *cardInventory;
+    std::vector<Card *> *cardDeck;
 
     explicit Database(const std::string &rootPath) {
         templates = new SimpleRegistry<int, CardTemplate *>();
-        cardInventory = new vector<Card *>;
-        cardDeck = new vector<Card *>;
+        cardInventory = new std::vector<Card *>;
+        cardDeck = new std::vector<Card *>;
         root = rootPath;
     }
 
@@ -44,11 +45,11 @@ class Database {
         return templates;
     }
 
-    vector<Card *> *getCardInventory() {
+    std::vector<Card *> *getCardInventory() {
         return cardInventory;
     }
 
-    vector<Card *> *getCardDeck() {
+    std::vector<Card *> *getCardDeck() {
         return cardDeck;
     }
 
