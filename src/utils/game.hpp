@@ -3,6 +3,7 @@
 
 #include "../playerinfo.hpp"
 #include "string"
+#include "battle.hpp"
 
 class GameClient {
 
@@ -21,7 +22,7 @@ class GameClient {
 
     [[nodiscard]] virtual Player *getPlayer() const noexcept(true) = 0;
 
-    //[[nodiscard]] virtual BattleHandler *getBattleHandler() const noexcept(true) = 0;
+    [[nodiscard]] virtual BattleHandler *getBattleHandler() const noexcept(true) = 0;
 
 };
 

@@ -395,7 +395,7 @@ inline void allocateSkillPoints(Player &player) {
     }
 }
 
-Player initPlayer();
+Player *initPlayer();
 void random_event(Player &p);
 void boss(Player p);
 void campfire(Player &p);

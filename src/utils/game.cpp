@@ -12,7 +12,7 @@ class SimpleGameClient : public GameClient {
     CommandParser *commandParser = nullptr;
     Database *database = nullptr;
     Player *player = nullptr;
-    //BattleHandler *battleHandler = nullptr;
+    BattleHandler *battleHandler = nullptr;
 
     bool running = false;
 
@@ -26,8 +26,7 @@ class SimpleGameClient : public GameClient {
 
     void loadData() noexcept(false) {
         validateState();
-        Player temp = initPlayer();
-        player = &temp;
+        player = initPlayer();
         std::cout << "Loading data..." << std::endl;
         database->load();
         std::cout << "Data loading complete!" << std::endl;
@@ -119,7 +118,7 @@ class SimpleGameClient : public GameClient {
         }
         commandExecutor = newCmdExecutor();
         commandParser = newCmdParser();
-        //battleHandler = new BattleHandler;
+        battleHandler = new BattleHandler;
         database = newDatabase(dataDir);
     }
 
@@ -153,11 +152,10 @@ class SimpleGameClient : public GameClient {
         return player;
     }
 
-    /*
+
     [[nodiscard]] BattleHandler *getBattleHandler() const noexcept(true) override {
         return battleHandler;
     }
-    */
 
 };
 
