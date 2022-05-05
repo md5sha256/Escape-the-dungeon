@@ -1,7 +1,7 @@
 #ifndef DATABASE_HPP
 #define DATABASE_HPP
 
-#include "../model/cardtemplate.hpp"
+#include "../model/card.hpp"
 #include "fstream"
 #include "registry.hpp"
 #include "string"
@@ -9,36 +9,45 @@
 class Database {
 
     protected:
-    const std::string TEMPLATE_FILE = "templates.json";
     const std::string CARD_DATABASE = "card-database.json";
 
     std::string root;
 
     Registry<int, CardTemplate> *templates;
-    Registry<int, Card> *cards;
+    vector<Card*> *cardInventory;
+    vector<Card*> *cardDeck;
 
     explicit Database(const std::string &rootPath) {
         templates = newRegistry<int, CardTemplate>();
-        cards = newRegistry<int, Card>();
+        cardInventory = new vector<Card*>;
+        cardDeck = new vector<Card*>;
         root = rootPath;
     }
 
     public:
     ~Database() {
-        // Delete the actual registries
-        delete &templates;
-        delete &cards;
         // Delete the pointers
         delete templates;
-        delete cards;
+        delete cardInventory;
+        for (auto ptr : *cardDeck) {
+            delete ptr;
+        }
+        for (auto ptr : *cardInventory) {
+            delete ptr;
+        }
+        delete cardDeck;
     }
 
     Registry<int, CardTemplate> *getTemplates() {
         return templates;
     }
 
-    Registry<int, Card> *getCards() {
-        return cards;
+    vector<Card*> *getCardInventory() {
+        return cardInventory;
+    }
+
+    vector<Card*> *getCardDeck() {
+        return cardDeck;
     }
 
     void load() noexcept(false) {
