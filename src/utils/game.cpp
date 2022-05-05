@@ -1,6 +1,5 @@
 #include "game.hpp"
 
-#include "../model/cardtemplate.hpp"
 #include "command_executor.hpp"
 #include "command_parser.hpp"
 #include "commands.hpp"
@@ -28,9 +27,7 @@ class SimpleGameClient : public GameClient {
         validateState();
         player = new PlayerInfo;
         std::cout << "Loading data..." << std::endl;
-        if (database != nullptr) {
-            database->load();
-        }
+        database->load();
         std::cout << "Data loading complete!" << std::endl;
     }
 

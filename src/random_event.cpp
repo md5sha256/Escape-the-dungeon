@@ -5,6 +5,8 @@
 #include"playerinfo.hpp"
 using namespace std;
 
+int bad_end = 0;
+
 void event1(player_info &p){
 	cout<<p.name<<" saw a pond of acidic mucus, inside it are some human skulls and left behind jewellery"<<endl<<"You can choose to: 1. go into the pond and pick up those jewllery || 2. Leave"<<endl;
 	cout<<"Your choice(Enter the number): ";

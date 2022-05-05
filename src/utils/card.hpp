@@ -2,8 +2,8 @@
 #define CARD_HPP
 
 #include "../playerinfo.hpp"
-#include "../utils/optional.hpp"
 #include "map"
+#include "optional.hpp"
 #include "type_traits"
 
 struct Card {
@@ -100,6 +100,8 @@ class CardTemplate {
     }
 
     public:
+    virtual ~CardTemplate() = default;
+
     [[nodiscard]] int getId() const noexcept(true) {
         return id;
     }

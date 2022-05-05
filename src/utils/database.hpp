@@ -1,9 +1,9 @@
 #ifndef DATABASE_HPP
 #define DATABASE_HPP
 
-#include "../model/card.hpp"
+#include "card.hpp"
 #include "fstream"
-#include "registry.hpp"
+#include "registry.cpp"
 #include "string"
 
 class Database {
@@ -13,40 +13,42 @@ class Database {
 
     std::string root;
 
-    Registry<int, CardTemplate> *templates;
-    vector<Card*> *cardInventory;
-    vector<Card*> *cardDeck;
+    Registry<int, CardTemplate *> *templates;
+    vector<Card *> *cardInventory;
+    vector<Card *> *cardDeck;
 
     explicit Database(const std::string &rootPath) {
-        templates = newRegistry<int, CardTemplate>();
-        cardInventory = new vector<Card*>;
-        cardDeck = new vector<Card*>;
+        templates = new SimpleRegistry<int, CardTemplate *>();
+        cardInventory = new vector<Card *>;
+        cardDeck = new vector<Card *>;
         root = rootPath;
     }
 
     public:
     ~Database() {
-        // Delete the pointers
-        delete templates;
-        delete cardInventory;
+        for (auto pair : templates->toMap()) {
+            delete pair.second;
+        }
         for (auto ptr : *cardDeck) {
             delete ptr;
         }
         for (auto ptr : *cardInventory) {
             delete ptr;
         }
+        delete templates;
+        delete cardInventory;
         delete cardDeck;
     }
 
-    Registry<int, CardTemplate> *getTemplates() {
+    Registry<int, CardTemplate *> *getTemplates() {
         return templates;
     }
 
-    vector<Card*> *getCardInventory() {
+    vector<Card *> *getCardInventory() {
         return cardInventory;
     }
 
-    vector<Card*> *getCardDeck() {
+    vector<Card *> *getCardDeck() {
         return cardDeck;
     }
 

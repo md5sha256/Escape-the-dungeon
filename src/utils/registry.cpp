@@ -3,57 +3,55 @@
 template<typename K, typename V>
 class SimpleRegistry : public Registry<K, V> {
 
-    std::map<K *, V *> map;
+    std::map<K, V> data;
 
     public:
     SimpleRegistry() = default;
 
-    explicit SimpleRegistry(const std::map<K*, V*> &values) {
-        map = std::map<K*, V*>(values);
+    explicit SimpleRegistry(const std::map<K, V> &values) {
+        data = std::map<K, V>(values);
     }
 
-    ~SimpleRegistry() {
-        delete map;
+    ~SimpleRegistry() override = default;
+
+    bool isRegistered(K &key) const noexcept(true) override {
+        return data.find(key) != data.end();
     }
 
-    bool isRegistered(K *key) const noexcept(true) override{
-        return map.find(key) != map.end();
-    }
-
-    bool add(const K *key, const V *value) override {
+    bool add(K &key, V &value) override {
         if (!isRegistered(key)) {
-            map[key] = value;
+            data[key] = value;
             return true;
         }
         return false;
     }
 
-    void remove(const K *key) override {
-        auto iter = map.find(key);
-        if (iter != map.end()) {
-            map.erase(iter);
+    void remove(K &key) override {
+        auto iter = data.find(key);
+        if (iter != data.end()) {
+            data.erase(iter);
         }
     }
 
-    optional<V> get(const K &key) override {
-        auto iter = map.find(key);
-        if (iter == map.end()) {
+    optional<V> get(K &key) override {
+        auto iter = data.find(key);
+        if (iter == data.end()) {
             return nullopt<V>();
         }
+        return optional<V>(&iter->second);
     }
 
-    std::map<K*, V*> toMap() const noexcept(true) override {
-        return std::map<K*, V*>{map};
+    std::map<K, V> toMap() const noexcept(true) override {
+        return std::map<K, V>{data};
     }
-
 };
 
 template<typename K, typename V>
-Registry<K, V>* newRegistry() {
+Registry<K, V> *newRegistry() {
     return new SimpleRegistry<K, V>;
 }
 
 template<typename K, typename V>
-Registry<K, V>* newRegistry(const std::map<K*, V*> &values) {
-    return new SimpleRegistry<K, V>;
+Registry<K, V> *newRegistry(const std::map<K, V> &values) {
+    return new SimpleRegistry<K, V>{values};
 }

@@ -174,15 +174,17 @@ struct path {
 struct shop_item{
 	int card_id;
 	int gold_cost;
+    shop_item(int cardId, int cost) {
+        card_id = cardId;
+        gold_cost = cost;
+    }
 };
 
 
-vector<shop_item> generate_shop_item(){
+inline vector<shop_item> generate_shop_item(){
 	vector<shop_item> item;
 	for (int i=4;i<10;i++){
-		shop_item temp;
-		temp.card_id=i;
-		temp.gold_cost=(rand()%40)+20;//cost of cards varies each time;
+		const shop_item temp(i, (rand() % 40) + 20); //cost of cards varies each time;
 		item.push_back(temp);
 	}
 	return item;

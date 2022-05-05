@@ -1,10 +1,8 @@
+#include"playerinfo.hpp"
 #include<iostream>
 #include<string>
-#include<cstdlib>
-#include<ctime>
 #include<vector>
 #include<sstream>
-#include"playerinfo.hpp"
 using namespace std;
 
 

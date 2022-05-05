@@ -11,22 +11,22 @@ class Registry {
     Registry() = default;
 
     public:
-    virtual ~Registry() = 0;
+    virtual ~Registry() = default;
 
-    virtual bool isRegistered(K *key) const noexcept(true) = 0;
+    virtual bool isRegistered(K &key) const noexcept(true) = 0;
 
-    virtual bool add(const K *key, const V *value) = 0;
+    virtual bool add(K &key, V &value) = 0;
 
-    virtual void remove(const K *key) = 0;
+    virtual void remove(K &key) = 0;
 
-    virtual optional<V> get(const K &key) = 0;
+    virtual optional<V> get(K &key) = 0;
 
-    virtual std::map<K *, V *> toMap() const noexcept(true) = 0;
+    virtual std::map<K, V> toMap() const noexcept(true) = 0;
 };
 
 template<typename K, typename V>
-Registry<K, V>* newRegistry();
+Registry<K, V> *newRegistry();
 template<typename K, typename V>
-Registry<K, V>* newRegistry(const std::map<K*, V*> &values);
+Registry<K, V> *newRegistry(const std::map<K, V> &values);
 
 #endif//REGISTRY_HPP

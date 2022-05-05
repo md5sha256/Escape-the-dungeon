@@ -101,19 +101,20 @@ class JsonDatabase : public Database {
     }
 
     vector<Card *> loadCards(rapidjson::Document &document, const char *key) {
+        if (!document.IsObject()) {
+            return {};
+        }
         auto deck = document.FindMember(key);
         std::map<int, Card *> cards;
         int max = 0;
-        if (deck != document.MemberEnd()) {
-            auto deckValue = &deck->value;
-            auto iter = deckValue->MemberBegin();
-            while (iter != deckValue->MemberEnd()) {
-                int index = iter->name.GetInt();
-                Card card = deserialize_card(iter->value);
-                cards[index] = &card;
-                if (index > max) {
-                    max = index;
-                }
+        auto deckValue = &deck->value;
+        auto iter = deckValue->MemberBegin();
+        while (iter != deckValue->MemberEnd()) {
+            int index = iter->name.GetInt();
+            Card card = deserialize_card(iter->value);
+            cards[index] = &card;
+            if (index > max) {
+                max = index;
             }
         }
         auto ret = vector<Card *>(max);
@@ -147,7 +148,7 @@ class JsonDatabase : public Database {
         saveCards(cards);
         ofstream databaseFile;
         databaseFile.open(path + CARD_DATABASE, std::ios::out | std::ios::trunc);
-        rapidjson::OStreamWrapper databaseWrapper = (databaseFile);
+        rapidjson::OStreamWrapper databaseWrapper(databaseFile);
         rapidjson::Writer<rapidjson::OStreamWrapper> writer(databaseWrapper);
         cards.Accept(writer);
         databaseFile.close();
