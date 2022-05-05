@@ -124,13 +124,18 @@ struct Entity {
 
     private:
     std::string name;
-    std::map<Attribute, int> attributes;
-
+    std::map<Attribute, int> defAttrs = {{Attribute::ATTACK, 0}, {Attribute::HEALTH, 0}, {Attribute::DEFENCE, 0}};
+    std::map<Attribute, int> attributes = std::map<Attribute, int>(defAttrs);
 
     public:
-    Entity(const std::string &_name, const std::map<Attribute, int> &attrs) {
+    explicit Entity(const std::string &_name) {
         name = _name;
-        attributes = attrs;
+    }
+
+    Entity(const std::string &_name, const std::map<Attribute, int> &attrs) : Entity(_name){
+        for (auto pair : attrs) {
+            attributes[pair.first] = pair.second;
+        }
     }
 
     std::string getName() noexcept {
@@ -145,6 +150,18 @@ struct Entity {
         attributes[attribute] += amt;
         if (attributes[attribute] < 0) {
             attributes[attribute] = 0;
+        }
+    }
+
+    [[nodiscard]] std::map<Attribute, int> getAttributes() const noexcept(true) {
+        return attributes;
+    }
+
+    void setAttributes(std::map<Attribute, int> &_attributes) noexcept(true) {
+        attributes.clear();
+        attributes = std::map<Attribute, int>(defAttrs);
+        for (auto pair : attributes) {
+            attributes[pair.first] = pair.second;
         }
     }
 
@@ -183,18 +200,34 @@ struct Player : public Entity {
     std::vector<Card*> inventory;
 
     public:
-    explicit Player(const std::string &name) : Entity(name, {{HEALTH, 10}, {ATTACK, 1}, {DEFENCE, 0}}) {
+    explicit Player(const std::string &name) : Entity(name) {
+    }
+
+    Player(const std::string &name, std::map<Attribute, int> &attrs) : Entity(name, attrs) {
+
     }
 
     std::vector<Card*> getCurrentDeck() {
         return currentDeck;
     }
 
+    void setDeck(const std::vector<Card*> &deck) {
+        currentDeck = deck;
+    }
+
     std::vector<Card*> getInventory() {
         return inventory;
     }
 
-    void setPath(std::vector<int> &_path) noexcept(true) {
+    void setInventory(const std::vector<Card*> &_inventory) {
+        inventory = _inventory;
+    }
+
+    std::vector<int> getPath() {
+        return path;
+    }
+
+    void setPath(const std::vector<int> &_path) noexcept(true) {
         path = _path;
     }
 
@@ -396,6 +429,9 @@ inline void allocateSkillPoints(Player &player) {
 }
 
 Player *initPlayer();
+
+void performGreetBack(Player *player);
+
 void random_event(Player &p);
 void boss(Player p);
 void campfire(Player &p);

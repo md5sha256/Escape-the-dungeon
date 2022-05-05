@@ -1,11 +1,12 @@
 #include "database.hpp"
+#include <sstream>
 
 #include "../../include/rapidjson/document.h"
 #include "optional.hpp"
 
 #include "../../include/rapidjson/istreamwrapper.h"
 #include "../../include/rapidjson/ostreamwrapper.h"
-#include "../../include/rapidjson/writer.h"
+#include "../../include/rapidjson/prettywriter.h"
 
 class JsonDatabase : public Database {
 
@@ -15,57 +16,57 @@ class JsonDatabase : public Database {
     const char *INT_ATTRIBUTES = "int-attributes";
     const char *DOUBLE_ATTRIBUTES = "double-attributes";
     const char *STRING_ATTRIBUTES = "string-attributes";
+    const char *NAME = "name";
+    const char *ATTRIBUTES = "attributes";
+    const char *SKILL_POINTS = "skill-points";
+    const char *GOLD = "gold";
+    const char *PATH = "path";
+    const char *PATH_POSITION = "path-pos";
     const char *DECK = "deck";
     const char *INVENTORY = "inventory";
 
     protected:
-    rapidjson::Value serialize_card(Card *card) {
-        rapidjson::Value templateId;
-        templateId.SetInt(card->getTemplateId());
-        rapidjson::Value cardId;
-        cardId.SetInt(card->getId());
+    rapidjson::Value serialize_card(Card *card, rapidjson::Document::AllocatorType &alloc) {
+        rapidjson::Value templateId(card->getTemplateId());
+        rapidjson::Value cardId(card->getId());
         rapidjson::Value intAttributes;
+        intAttributes.SetObject();
         rapidjson::Value doubleAttributes;
+        doubleAttributes.SetObject();
         rapidjson::Value stringAttributes;
+        stringAttributes.SetObject();
         for (auto &pair : card->getIntAttributes()) {
-            rapidjson::Value value;
-            value.SetInt(pair.second);
-            intAttributes[pair.first.c_str()] = value;
+            rapidjson::Value value(pair.second);
+            intAttributes.AddMember(rapidjson::StringRef(pair.first.c_str()), value, alloc);
         }
         for (auto &pair : card->getDoubleAttributes()) {
-            rapidjson::Value value;
-            value.SetDouble(pair.second);
-            doubleAttributes[pair.first.c_str()] = value;
+            rapidjson::Value value(pair.second);
+            intAttributes.AddMember(rapidjson::StringRef(pair.first.c_str()), value, alloc);
         }
         for (auto &pair : card->getStringAttributes()) {
-            rapidjson::Value value;
-            std::string data = pair.second;
-            value.SetString(data.c_str(), data.size());
-            stringAttributes[pair.first.c_str()] = value;
+            rapidjson::Value value(rapidjson::StringRef(pair.second.data()), alloc);
+            intAttributes.AddMember(rapidjson::StringRef(pair.first.c_str()), value, alloc);
         }
         rapidjson::Value member;
-        member[TEMPLATE_ID] = templateId;
-        member[CARD_ID] = cardId;
-        member[INT_ATTRIBUTES] = intAttributes;
-        member[DOUBLE_ATTRIBUTES] = doubleAttributes;
-        member[STRING_ATTRIBUTES] = stringAttributes;
+        member.SetObject();
+        member.AddMember(rapidjson::StringRef(TEMPLATE_ID), templateId, alloc);
+        member.AddMember(rapidjson::StringRef(CARD_ID), cardId, alloc);
+        member.AddMember(rapidjson::StringRef(INT_ATTRIBUTES), intAttributes, alloc);
+        member.AddMember(rapidjson::StringRef(DOUBLE_ATTRIBUTES), doubleAttributes, alloc);
+        member.AddMember(rapidjson::StringRef(STRING_ATTRIBUTES), stringAttributes, alloc);
         return member;
     }
 
     void saveCards(rapidjson::Document &document, const std::vector<Card *> &cards, const char *key) {
         rapidjson::Value value;
+        value.SetObject();
+        rapidjson::Document::AllocatorType alloc = document.GetAllocator();
         for (int i = 0; i < cards.size(); i++) {
-            rapidjson::Value member = serialize_card(cards[i]);
-            std::string s = std::to_string(i);
-            const char *index = s.c_str();
-            value[index] = member;
+            rapidjson::Value member = serialize_card(cards[i], alloc);
+            auto index = rapidjson::StringRef(std::to_string(i).data());
+            value.AddMember(index, member, alloc);
         }
-        document[key] = value;
-    }
-
-    void saveCards(rapidjson::Document &document) {
-        saveCards(document, *getCardDeck(), DECK);
-        saveCards(document, *getCardInventory(), INVENTORY);
+        document.AddMember(rapidjson::StringRef(key), value, document.GetAllocator());
     }
 
     Card deserialize_card(rapidjson::Value &value) {
@@ -101,16 +102,11 @@ class JsonDatabase : public Database {
         return Card{cardId, templateId, intAttributes, doubleAttributes, stringAttributes};
     }
 
-    std::vector<Card *> loadCards(rapidjson::Document &document, const char *key) {
-        if (!document.IsObject()) {
-            return {};
-        }
-        auto deck = document.FindMember(key);
+    std::vector<Card *> loadCards(rapidjson::Value &deckValue) {
         std::map<int, Card *> cards;
         int max = 0;
-        auto deckValue = &deck->value;
-        auto iter = deckValue->MemberBegin();
-        while (iter != deckValue->MemberEnd()) {
+        auto iter = deckValue.MemberBegin();
+        while (iter != deckValue.MemberEnd()) {
             int index = iter->name.GetInt();
             Card card = deserialize_card(iter->value);
             cards[index] = &card;
@@ -125,33 +121,146 @@ class JsonDatabase : public Database {
         return ret;
     }
 
+    rapidjson::Value serializeInts(const std::vector<int> &ints, rapidjson::Document::AllocatorType &allocator) {
+        rapidjson::Value ret;
+        ret.SetArray();
+        auto array = ret.GetArray();
+        for (const int &i : ints) {
+            ret.PushBack(i, allocator);
+        }
+        return ret;
+    }
+
+    std::vector<int> deserializeInts(const rapidjson::Value &value) {
+        std::vector<int> ret;
+        if (!value.IsArray()) {
+            return ret;
+        }
+        auto array = value.GetArray();
+        ret.reserve(array.Size());
+        auto iter = array.Begin();
+        while (iter != array.End()) {
+            ret.push_back(iter->GetInt());
+            iter++;
+        }
+        return ret;
+    }
+
+    rapidjson::Value serializeAttributes(const std::map<Entity::Attribute, int> &attributes, rapidjson::Document::AllocatorType &allocator) {
+        rapidjson::Value ret;
+        ret.SetObject();
+        for (auto pair : attributes) {
+            std::string name = Entity::getAttributeName(pair.first);
+            rapidjson::Value value(pair.second);
+            rapidjson::Value key(name.data(), allocator);
+            ret.AddMember(key, value, allocator);
+        }
+        return ret;
+    }
+
+    std::map<Entity::Attribute, int> deserializeAttributes(rapidjson::Value &value) {
+        std::map<Entity::Attribute, int> ret;
+        auto iter = value.MemberBegin();
+        while (iter != value.MemberEnd()) {
+            auto key = &iter->name;
+            auto val = &iter->value;
+            std::string rawAttr = key->GetString();
+            Entity::Attribute attribute;
+            try {
+                attribute = Entity::getAttribute(rawAttr);
+            } catch (std::invalid_argument &ex) {
+                std::cout << "[DATABASE] invalid attribute name " << attribute << " found when loading player data";
+                continue;
+            }
+            int attrValue = val->GetInt();
+            ret[attribute] = attrValue;
+            iter++;
+        }
+        return ret;
+    }
+
+    void savePlayer(rapidjson::Document &document, Player &player) {
+        document.SetObject();
+        rapidjson::Value name(player.getName().data(), document.GetAllocator());
+        rapidjson::Value gold(player.getGold());
+        rapidjson::Value path = serializeInts(player.getPath(), document.GetAllocator());
+        rapidjson::Value pos(player.getPosition());
+        rapidjson::Value attributes = serializeAttributes(player.getAttributes(), document.GetAllocator());
+        rapidjson::Value skillPoints(player.getSkillPoints());
+        rapidjson::Document::AllocatorType alloc = document.GetAllocator();
+        document.AddMember(rapidjson::StringRef(NAME), name, alloc);
+        document.AddMember(rapidjson::StringRef(GOLD), gold, alloc);
+        document.AddMember(rapidjson::StringRef(PATH), path, alloc);
+        document.AddMember(rapidjson::StringRef(PATH_POSITION), pos, alloc);
+        document.AddMember(rapidjson::StringRef(ATTRIBUTES), attributes, alloc);
+        document.AddMember(rapidjson::StringRef(SKILL_POINTS), skillPoints, alloc);
+        saveCards(document, player.getCurrentDeck(), DECK);
+        saveCards(document, player.getInventory(), INVENTORY);
+    }
+
+    optional<Player> loadPlayer(rapidjson::Document &document) {
+        auto name = document.FindMember(NAME);
+        if (name == document.MemberEnd()) {
+            return nullopt<Player>();
+        }
+        std::string playerName = name->value.GetString();
+        auto *player = new Player(playerName);
+        auto gold = document.FindMember(GOLD);
+        if (gold != document.MemberEnd()) {
+            player->modifyGold(gold->value.GetInt());
+        }
+        auto skillPoints = document.FindMember(SKILL_POINTS);
+        if (skillPoints != document.MemberEnd()) {
+            player->modifySkillPoints(skillPoints->value.GetInt());
+        }
+        auto path = document.FindMember(PATH);
+        if (path != document.MemberEnd()) {
+            player->setPath(deserializeInts(path->value));
+        }
+        auto attributes = document.FindMember(ATTRIBUTES);
+        if (attributes != document.MemberEnd()) {
+            auto attrs = deserializeAttributes(attributes->value);
+            player->setAttributes(attrs);
+        }
+        auto deck = document.FindMember(DECK);
+        if (deck != document.MemberEnd()) {
+            auto cards = loadCards(deck->value);
+            player->setDeck(cards);
+        }
+        auto inventory = document.FindMember(INVENTORY);
+        if (inventory != document.MemberEnd()) {
+            auto cards = loadCards(inventory->value);
+            player->setInventory(cards);
+        }
+        return optional<Player>{player};
+    }
+
     public:
     explicit JsonDatabase(const std::string &rootPath) : Database(rootPath) {
     }
 
     ~JsonDatabase() = default;
 
-    void load(const std::string &path) noexcept(false) override {
+    optional<Player> load(const std::string &path) noexcept(false) override {
         std::ifstream databaseFile;
-        databaseFile.open(path + CARD_DATABASE, std::ios::in | std::ios::ate);
+        databaseFile.open(path + PLAYER_DATA);
         rapidjson::IStreamWrapper databaseWrapper(databaseFile);
-        rapidjson::Document cards;
-        cards.ParseStream(databaseWrapper);
+        rapidjson::Document data;
+        data.ParseStream(databaseWrapper);
         databaseFile.close();
-        auto deck = loadCards(cards, DECK);
-        cardDeck = &deck;
-        auto inventory = loadCards(cards, INVENTORY);
-        cardInventory = &inventory;
+        return loadPlayer(data);
     }
 
-    void save(const std::string &path) noexcept(false) override {
-        rapidjson::Document cards;
-        saveCards(cards);
+    void save(const std::string &path, Player &player) noexcept(false) override {
+        rapidjson::Document data;
+        savePlayer(data, player);
         std::ofstream databaseFile;
-        databaseFile.open(path + CARD_DATABASE, std::ios::out | std::ios::trunc);
+
+        databaseFile.open(path + PLAYER_DATA, std::ios::out | std::ios::trunc);
         rapidjson::OStreamWrapper databaseWrapper(databaseFile);
-        rapidjson::Writer<rapidjson::OStreamWrapper> writer(databaseWrapper);
-        cards.Accept(writer);
+        rapidjson::PrettyWriter<rapidjson::OStreamWrapper> writer(databaseWrapper);
+        writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatSingleLineArray);
+        data.Accept(writer);
         databaseFile.close();
     }
 };

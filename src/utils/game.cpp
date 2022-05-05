@@ -26,10 +26,23 @@ class SimpleGameClient : public GameClient {
 
     void loadData() noexcept(false) {
         validateState();
-        player = initPlayer();
         std::cout << "Loading data..." << std::endl;
-        database->load();
+        optional<Player> optionalPlayer = database->load();
         std::cout << "Data loading complete!" << std::endl;
+        if (optionalPlayer.is_empty()) {
+            player = initPlayer();
+        } else {
+            player = optionalPlayer.value();
+            performGreetBack(player);
+        }
+    }
+
+    void saveData() noexcept(false) {
+        if (player != nullptr) {
+            std::cout << "Saving data..." << std::endl;
+            database->save(*player);
+            std::cout << "Data save complete!" << std::endl;
+        }
     }
 
     void registerCommands() noexcept(false) {
@@ -104,7 +117,7 @@ class SimpleGameClient : public GameClient {
     ~SimpleGameClient() override {
         delete commandExecutor;
         delete commandParser;
-        //delete battleHandler;
+        delete battleHandler;
         delete player;
     }
 
@@ -146,6 +159,7 @@ class SimpleGameClient : public GameClient {
     void shutdown() noexcept(false) override {
         // Call stop just in case we aren't already stopped
         stop();
+        saveData();
     }
 
     [[nodiscard]] Player *getPlayer() const noexcept(true) override {

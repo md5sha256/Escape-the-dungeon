@@ -10,7 +10,7 @@
 class Database {
 
     protected:
-    const std::string CARD_DATABASE = "card-database.json";
+    const std::string PLAYER_DATA = "player-data.json";
 
     std::string root;
 
@@ -45,25 +45,17 @@ class Database {
         return templates;
     }
 
-    std::vector<Card *> *getCardInventory() {
-        return cardInventory;
+    optional<Player> load() noexcept(false) {
+        return load(root);
     }
 
-    std::vector<Card *> *getCardDeck() {
-        return cardDeck;
+    virtual optional<Player> load(const std::string &path) noexcept(false) = 0;
+
+    void save(Player &player) noexcept(false) {
+        save(root, player);
     }
 
-    void load() noexcept(false) {
-        load(root);
-    }
-
-    virtual void load(const std::string &path) noexcept(false) = 0;
-
-    void save() noexcept(false) {
-        save(root);
-    }
-
-    virtual void save(const std::string &path) noexcept(false) = 0;
+    virtual void save(const std::string &path, Player &player) noexcept(false) = 0;
 };
 
 Database *newDatabase(const std::string &path) noexcept(true);

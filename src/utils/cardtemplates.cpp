@@ -67,13 +67,11 @@ class DamageCardTemplate : CardTemplate {
         optional<int> amount = cardData.getIntAttribute(DATA_KEY);
         if (amount.is_present()) {
             int value = *amount.value();
-
             optional<Battle> battleOpt = client->getBattleHandler()->getcurrentBattle();
             if (battleOpt.is_present()) {
                 Entity *target = battleOpt.value()->entity;
                 target->take_damage(value);
             }
-             
         }
     }
 

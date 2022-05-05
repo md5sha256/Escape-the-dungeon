@@ -1,14 +1,19 @@
-#include "start.hpp"
+#include "playerinfo.hpp"
+
 #include <iostream>
 #include <string>
 
 Player* initPlayer() {
+    typedef Entity::Attribute Attribute;
     std::string name;
     std::cout << "Please enter your name: ";
     std::cin >> name;
     std::string input;
     std::cout << "Please allocate your skill points:" << std::endl;
     auto *player = new Player(name);
+    player->modifyAttribute(Attribute::HEALTH, 10);
+    player->modifyAttribute(Attribute::ATTACK, 1);
+    player->modifyAttribute(Attribute::DEFENCE, 0);
     allocateSkillPoints(*player);
     Path g;
     g.generate();
@@ -71,4 +76,12 @@ Player* initPlayer() {
     }
     player->setPath(playerPath);
     return player;
+}
+
+void performGreetBack(Player *player) {
+    std::cout << "Welcome back " << player->getName() << "!" << std::endl;
+    player->printStatus();
+    if (player->getSkillPoints() > 0) {
+        std::cout << "You have some unallocated skill points. Run /skills allocate to allocate them!" << std::endl;
+    }
 }
