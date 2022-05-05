@@ -97,15 +97,15 @@ struct player_info {
             } else
                 cout << "Please enter a valid number." << endl;
         }
+    }
         
         
-        bool check_if_dead(){
-		if(hp<=0){
-			return true;
-		}
-		else
-		return false;
-	}
+    bool check_if_dead() {
+        if (hp <= 0) {
+            return true;
+        } else
+            return false;
+    }
 	
 	void take_damage(int damage){
 		if (defence>0 && defence >=damage){
@@ -118,7 +118,6 @@ struct player_info {
 		}
 		else
 		hp-=damage;
-	}
     }
 
     void generate_in_hand_cards() {
