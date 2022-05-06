@@ -55,6 +55,6 @@ A random incident would be generated, different choices are provided and the pla
 - fight.cpp (Generate monster when called)
 - campfire.cpp (Let player decide if heal HP or allocate one more skill point)
 - shop.cpp (Provide new cards that player can buy)
-- random_event.cpp (Provide a special effect to the player, either positive or negtaive)
+- randomEvent.cpp (Provide a special effect to the player, either positive or negtaive)
 - boss.cpp (Generate a boss, if boss defeated --> win, else --> lose)
 

@@ -45,11 +45,11 @@ class Database {
         return templates;
     }
 
-    optional<Player> load() noexcept(false) {
+    Optional<Player> load() noexcept(false) {
         return load(root);
     }
 
-    virtual optional<Player> load(const std::string &path) noexcept(false) = 0;
+    virtual Optional<Player> load(const std::string &path) noexcept(false) = 0;
 
     void save(Player &player) noexcept(false) {
         save(root, player);

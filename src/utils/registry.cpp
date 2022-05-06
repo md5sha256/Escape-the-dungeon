@@ -33,12 +33,12 @@ class SimpleRegistry : public Registry<K, V> {
         }
     }
 
-    optional<V> get(K &key) override {
+    Optional<V> get(K &key) override {
         auto iter = data.find(key);
         if (iter == data.end()) {
             return nullopt<V>();
         }
-        return optional<V>(&iter->second);
+        return Optional<V>(&iter->second);
     }
 
     std::map<K, V> toMap() const noexcept(true) override {

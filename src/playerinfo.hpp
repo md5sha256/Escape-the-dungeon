@@ -20,11 +20,11 @@ struct Card {
     std::map<const std::string, std::string> stringAttributes;
 
     template<typename T>
-    [[nodiscard]] static optional<T> getAttribute(const std::string &key, const std::map<const std::string, T> map) {
+    [[nodiscard]] static Optional<T> getAttribute(const std::string &key, const std::map<const std::string, T> map) {
         auto iter = map.find(key);
         if (iter != map.end()) {
             auto value = iter->second;
-            return optional<T>(&value);
+            return Optional<T>(&value);
         }
         return nullopt<T>();
     }
@@ -52,15 +52,15 @@ struct Card {
         return id;
     }
 
-    [[nodiscard]] optional<int> getIntAttribute(const std::string &key) const {
+    [[nodiscard]] Optional<int> getIntAttribute(const std::string &key) const {
         return getAttribute<int>(key, intAttributes);
     }
 
-    [[nodiscard]] optional<double> getDoubleAttribute(const std::string &key) const {
+    [[nodiscard]] Optional<double> getDoubleAttribute(const std::string &key) const {
         return getAttribute<double>(key, doubleAttributes);
     }
 
-    [[nodiscard]] optional<std::string> getStringAttribute(const std::string &key) const {
+    [[nodiscard]] Optional<std::string> getStringAttribute(const std::string &key) const {
         return getAttribute<std::string>(key, stringAttributes);
     }
 
@@ -171,11 +171,11 @@ struct Entity {
         std::cout << "Defence: " << getAttribute(DEFENCE) << std::endl;
     }
 
-    bool check_if_dead() {
+    bool isDead() {
         return getAttribute(HEALTH) <= 0;
     }
 
-    void take_damage(int damage){
+    void takeDamage(int damage){
         int defence = getAttribute(DEFENCE);
         // Use up the defence points first
         modifyAttribute(DEFENCE, -damage);
@@ -432,7 +432,7 @@ Player *initPlayer();
 
 void performGreetBack(Player *player);
 
-void random_event(Player &p);
+void randomEvent(Player &p);
 void boss(Player p);
 void campfire(Player &p);
 

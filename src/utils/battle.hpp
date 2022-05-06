@@ -28,6 +28,10 @@ struct Battle {
     [[nodiscard]] Entity *getEntity() const {
         return entity;
     }
+
+    bool isValid() const {
+        return !player->isDead() && !entity->isDead();
+    }
 };
 
 class BattleHandler {
@@ -55,8 +59,8 @@ class BattleHandler {
         return currentBattle != nullptr;
     }
 
-    [[nodiscard]] optional<Battle> getcurrentBattle() const noexcept(true) {
-        return optional<Battle>{currentBattle};
+    [[nodiscard]] Optional<Battle> getcurrentBattle() const noexcept(true) {
+        return Optional<Battle>{currentBattle};
     }
 
     void endBattle() {

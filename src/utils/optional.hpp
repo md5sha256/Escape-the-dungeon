@@ -5,20 +5,20 @@
 #include "stdexcept"
 
 template<typename T>
-class optional {
+class Optional {
 
     T *ptr;
 
     public:
-    explicit optional(T *t) {
+    explicit Optional(T *t) {
         ptr = t;
     }
 
-    [[nodiscard]] bool is_present() const noexcept(true) {
+    [[nodiscard]] bool isPresent() const noexcept(true) {
         return ptr != nullptr;
     }
 
-    [[nodiscard]] bool is_empty() const noexcept(true) {
+    [[nodiscard]] bool isEmpty() const noexcept(true) {
         return ptr == nullptr;
     }
 
@@ -31,8 +31,8 @@ class optional {
 };
 
 template<typename T>
-optional<T> nullopt() {
-    return optional<T>(nullptr);
+Optional<T> nullopt() {
+    return Optional<T>(nullptr);
 }
 
 #endif//OPTIONAL_HPP

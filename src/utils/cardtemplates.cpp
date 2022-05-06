@@ -20,8 +20,8 @@ class SkillPointCardTemplate : CardTemplate {
         if (cardData.getTemplateId() != getId()) {
             return;
         }
-        optional<int> amount = cardData.getIntAttribute(DATA_KEY);
-        if (amount.is_present()) {
+        Optional<int> amount = cardData.getIntAttribute(DATA_KEY);
+        if (amount.isPresent()) {
             int value = *amount.value();
             if (value > 0) {
                 player.addSkillPoints(value);
@@ -40,8 +40,8 @@ class SkillPointCardTemplate : CardTemplate {
         if (card.getTemplateId() != getId()) {
             return;
         }
-        optional<int> amount = card.getIntAttribute(DATA_KEY);
-        if (amount.is_empty()) {
+        Optional<int> amount = card.getIntAttribute(DATA_KEY);
+        if (amount.isEmpty()) {
             return;
         }
         std::cout << "Skill Point Card" << std::endl << std::endl;
@@ -64,13 +64,13 @@ class DamageCardTemplate : CardTemplate {
         if (cardData.getTemplateId() != getId()) {
             return;
         }
-        optional<int> amount = cardData.getIntAttribute(DATA_KEY);
-        if (amount.is_present()) {
+        Optional<int> amount = cardData.getIntAttribute(DATA_KEY);
+        if (amount.isPresent()) {
             int value = *amount.value();
-            optional<Battle> battleOpt = client->getBattleHandler()->getcurrentBattle();
-            if (battleOpt.is_present()) {
+            Optional<Battle> battleOpt = client->getBattleHandler()->getcurrentBattle();
+            if (battleOpt.isPresent()) {
                 Entity *target = battleOpt.value()->entity;
-                target->take_damage(value);
+                target->takeDamage(value);
             }
         }
     }

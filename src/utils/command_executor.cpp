@@ -8,12 +8,12 @@ class SimpleExecutor : public CommandExecutor {
 
     std::map<string, Command*> registeredCommands;
 
-    optional<Command> findCommand(const string &name) {
+    Optional<Command> findCommand(const string &name) {
         auto iter = registeredCommands.find(name);
         if (iter == registeredCommands.end()) {
             return nullopt<Command>();
         }
-        return optional<Command>(iter->second);
+        return Optional<Command>(iter->second);
     }
 
     public:
@@ -50,8 +50,8 @@ class SimpleExecutor : public CommandExecutor {
     }
 
     bool executeCommand(Player &player, const CommandData &data) noexcept(false) override {
-        optional<Command> optionalCmd = findCommand(data.getCommandName());
-        if (optionalCmd.is_empty()) {
+        Optional<Command> optionalCmd = findCommand(data.getCommandName());
+        if (optionalCmd.isEmpty()) {
             return false;
         }
         Command *command = optionalCmd.value();

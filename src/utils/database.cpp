@@ -198,7 +198,7 @@ class JsonDatabase : public Database {
         saveCards(document, player.getInventory(), INVENTORY);
     }
 
-    optional<Player> loadPlayer(rapidjson::Document &document) {
+    Optional<Player> loadPlayer(rapidjson::Document &document) {
         auto name = document.FindMember(NAME);
         if (name == document.MemberEnd()) {
             return nullopt<Player>();
@@ -232,7 +232,7 @@ class JsonDatabase : public Database {
             auto cards = loadCards(inventory->value);
             player->setInventory(cards);
         }
-        return optional<Player>{player};
+        return Optional<Player>{player};
     }
 
     public:
@@ -241,7 +241,7 @@ class JsonDatabase : public Database {
 
     ~JsonDatabase() = default;
 
-    optional<Player> load(const std::string &path) noexcept(false) override {
+    Optional<Player> load(const std::string &path) noexcept(false) override {
         std::ifstream databaseFile;
         databaseFile.open(path + PLAYER_DATA);
         rapidjson::IStreamWrapper databaseWrapper(databaseFile);

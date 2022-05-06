@@ -19,7 +19,7 @@ class Registry {
 
     virtual void remove(K &key) = 0;
 
-    virtual optional<V> get(K &key) = 0;
+    virtual Optional<V> get(K &key) = 0;
 
     virtual std::map<K, V> toMap() const noexcept(true) = 0;
 };

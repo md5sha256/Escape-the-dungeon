@@ -27,9 +27,9 @@ class SimpleGameClient : public GameClient {
     void loadData() noexcept(false) {
         validateState();
         std::cout << "Loading data..." << std::endl;
-        optional<Player> optionalPlayer = database->load();
+        Optional<Player> optionalPlayer = database->load();
         std::cout << "Data loading complete!" << std::endl;
-        if (optionalPlayer.is_empty()) {
+        if (optionalPlayer.isEmpty()) {
             player = initPlayer();
         } else {
             player = optionalPlayer.value();
@@ -57,8 +57,8 @@ class SimpleGameClient : public GameClient {
 
     bool awaitUserInput() {
         validateState();
-        optional<CommandData> input = commandParser->processCommand();
-        if (input.is_present()) {
+        Optional<CommandData> input = commandParser->processCommand();
+        if (input.isPresent()) {
             CommandData commandData = *input.value();
             if (commandData.getCommandName().empty()) {
                 printf("%s: %s\n", "Unknown command", toString(commandData.getArgs()).data());

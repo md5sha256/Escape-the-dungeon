@@ -16,8 +16,8 @@ void event1(Player &p) {
         std::cin >> input;
         if (input == "1") {               //if player choose to go into the pond
             int damage = (rand() % 5) + 1;//deal 1-5 damage to player
-            p.take_damage(damage);
-            if (p.check_if_dead()) {
+            p.takeDamage(damage);
+            if (p.isDead()) {
                 std::cout << p.getName() << " endures the severe pain brought by strong acid, picked up the jewelry in the pond, but never got the chance to go back to the shore again" << std::endl;
                 bad_end = 1;
             } else {
@@ -125,7 +125,7 @@ void event4(Player &p) {
     }
 }
 
-void random_event(Player &p) {
+void randomEvent(Player &p) {
     srand(time(nullptr));
     int choice = rand() % 4;
     switch (choice) {

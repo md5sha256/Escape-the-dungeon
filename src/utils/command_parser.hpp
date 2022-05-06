@@ -16,7 +16,7 @@ class CommandParser {
     public:
     virtual ~CommandParser() = default;
 
-    virtual optional<CommandData> processCommand() noexcept(true) = 0;
+    virtual Optional<CommandData> processCommand() noexcept(true) = 0;
 };
 
 CommandParser* newCmdParser();

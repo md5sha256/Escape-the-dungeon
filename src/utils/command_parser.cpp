@@ -12,7 +12,7 @@ class SimpleCommandParser : public CommandParser {
     SimpleCommandParser() : SimpleCommandParser('/') {
     }
 
-    optional<CommandData> processCommand() noexcept(true) override {
+    Optional<CommandData> processCommand() noexcept(true) override {
         char raw[1024];
         std::cin.getline(raw, 1024, '\n');
         std::stringstream ss(raw);
@@ -29,7 +29,7 @@ class SimpleCommandParser : public CommandParser {
             while (ss >> arg) {
                 args.push_back(arg);
             }
-            return optional<CommandData>(new CommandData(cmdName, args));
+            return Optional<CommandData>(new CommandData(cmdName, args));
         } else {
             // Not enough input/blank string
             //std::cout << "Blank command entered. Please enter a command." << std::endl;
