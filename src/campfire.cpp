@@ -6,4 +6,6 @@ void campfire(Player &p){
 	std::cout<<"Note: You obtained 2 additional skill points, you may want to allocate them."<<std::endl;
     p.addSkillPoints(2);
     allocateSkillPoints(p);
+	cout<<"With the yelling of monster closing in, "<<p.getName()<<" knows this won't be a safe place to stay."<<endl;
+	cout<<"\"Better keep going until they reach me.\" "<<p.getName()<<"thinks."<<endl;
 }
