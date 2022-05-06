@@ -17,7 +17,7 @@ class CommandExecutor {
 
     virtual bool registerCommand(Command *command) noexcept(false) = 0;
 
-    virtual bool executeCommand(Player &player, const CommandData &command) noexcept(false) = 0;
+    virtual bool executeCommand(Player *player, const CommandData &command) noexcept(false) = 0;
 };
 
 CommandExecutor* newCmdExecutor();

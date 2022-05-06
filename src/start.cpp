@@ -11,10 +11,10 @@ Player* initPlayer() {
     std::string input;
     std::cout << "Please allocate your skill points:" << std::endl;
     auto *player = new Player(name);
-    player->modifyAttribute(Attribute::HEALTH, 10);
+    player->modifyAttribute(Attribute::HEALTH, DEFAULT_PLAYER_HEALTH);
     player->modifyAttribute(Attribute::ATTACK, 1);
     player->modifyAttribute(Attribute::DEFENCE, 0);
-    allocateSkillPoints(*player);
+    allocateSkillPoints(player);
     Path g;
     g.generate();
     std::cout << "Please select your path to the entrance." << std::endl;
@@ -80,6 +80,7 @@ Player* initPlayer() {
 
 void performGreetBack(Player *player) {
     std::cout << "Welcome back " << player->getName() << "!" << std::endl;
+    player->printMap();
     player->printStatus();
     if (player->getSkillPoints() > 0) {
         std::cout << "You have some unallocated skill points. Run /skills allocate to allocate them!" << std::endl;

@@ -1,59 +1,115 @@
 #include "shop.hpp"
 #include <iostream>
-#include <sstream>
 #include <string>
-#include <vector>
-using namespace std;
+#include "utils/game.hpp"
+#include "utils/cardtemplates.hpp"
 
-void shop_item_print() {
-}
+class SimpleShop : public Shop {
 
-void buy_item(Player &p, Card *card, int gold_cost) {
-    if (p.getGold() >= gold_cost) {
-        p.getInventory().push_back(card);
-        p.modifyGold(-gold_cost);
-        cout << "\"Yes! it would definately help your journey in the dungeon!\"" << endl
-             << "You have " << p.getGold() << " left." << endl;
-    } else
-        cout << "\"Doesn't look like your wallet is ready for this..\"" << endl;
-}
+    ShopItem generateShopItem(GameClient *client) {
+        Registry<int, CardTemplate *> *registry = client->getCardTemplates();
 
-void shop(Player &p) {
-    string input;
-    vector<ShopItem> goods;
-    cout << p.getName() << " found a house, with a signboard written:\"7/24 business\"" << endl;
-    vector<ShopItem> item;
-    item=generate_shop_item();
-	cout<<"You have "<<p.gold<<" gold."<<endl;
-    int buy_count=0;//the number of time player enters /buy command.
-    while (true) {
-        cout<<"Would you like to take a look inside? (/buy) or leave (/skip): ";
-        cin >> input;
-        if (input == "/buy") {
-            buy_count+=1;
-            if (buy_count==0)//Welcome from shop owner for the first time entering the shop
-            cout << "\"Oh, a human! Haven't seen one in quite a few years, what can I help you?\""<<endl<<"said a little Goblin standing in front of a shelf.";
-            cout << "\"Free free to look around and see if there is anything interests you.\""<<endl;
-            shop_item_print();
-            while (true) {
-                cout << "Enter the item ID that you want to buy or enter /back to cancel the action: ";
-                cin >> input;
-                if (input == "6" || input == "1" || input == "2" || input == "3" || input == "4" || input == "5") {
-                    int num;
-                    stringstream ss(input);
-                    ss >> num;
-                    num -= 1;
-                    cout << item[num].getCard()->getId() << item[num].getGoldCost();
-                    buy_item(p, item[num].getCard(), item[num].getGoldCost());
-                } else if (input == "/back")
-                    break;
-                else
-                    cout << "Enter a valid ID or command!" << endl;
-            }
-        } else if (input == "/skip") {
-            p.incrementPosition();
-            break;
-        } else
-            cout << "Please enter a valid command!" << endl;
+        // LEGENDARY CARDS
+        int chanceLegendary = 100 - 10;
+        int priceLegendary = 200;
+        int legendary[] = {REVIVE_CARD, WIN_BATTLE_CARD};
+        // RARE CARDS
+        int chanceRare = 100 - 30;
+        int priceRare = 40;
+        int rare[] = {TELEPORT_CARD, SKILL_POINT_CARD};
+
+        // COMMON CARDS
+        int chanceCommon = 100 - 60;
+        int priceCommon = 10;
+        int common[] = {DAMAGE_CARD};
+
+        int random = rand() % 101;
+        int templateId;
+        int price;
+        if (random >= chanceLegendary) {
+            int size = sizeof legendary;
+            int index = random % size;
+            templateId = legendary[index];
+            price = priceLegendary;
+        } else if (random >= chanceRare) {
+            int size = sizeof rare;
+            int index = random % size;
+            templateId = rare[index];
+            price = priceRare;
+        } else if (random >= chanceCommon) {
+            templateId = common[0];
+            price = priceCommon;
+        } else {
+            throw std::invalid_argument("Improper card setup detected!");
+        }
+        Card *item = client->getDatabase()->createCard(templateId);
+        return ShopItem{item, price};
     }
+
+    public:
+    explicit SimpleShop(const int &size) : Shop(size) {
+
+    }
+
+    void generateItems(GameClient *client) override {
+        items.clear();
+        items.reserve(getSize());
+        for (int i = 0; i < getSize(); i++) {
+            items[i] = generateShopItem(client);
+        }
+    }
+
+    void buyItem(Player *player, int index) override {
+        if (index < 0 || index > getSize() - 1) {
+            throw std::invalid_argument("Invalid item index: " + std::to_string(index));
+        }
+        ShopItem item = items[index];
+        if (player->getGold() >= item.getGoldCost()) {
+            player->addCardToInventory(item.getCard());
+            player->modifyGold(-item.getGoldCost());
+            std::cout << "\"Yes! it would definitely help your journey in the dungeon!\"" << std::endl
+                      << "You have " << player->getGold() << " left." << std::endl;
+            removeItem(index);
+        } else {
+            std::cout << "\"Doesn't look like your wallet is ready for this..\"" << std::endl;
+        }
+    }
+
+    void greetPlayer(Player *player) override {
+        std::string input;
+        std::cout << player->getName() << " found a house, with a signboard written:\"7/24 business\"" << std::endl;
+        std::cout << "You have " << player->getGold() << " gold." << std::endl;
+        if (getOriginalSize() == getSize()) {
+            // Initial greeting
+            std::cout << "\"Oh, a human! Haven't seen one in quite a few years, what can I help you with?\"" << std::endl
+                      << "said a little Goblin standing in front of a shelf." << std::endl;
+        } else {
+            std::cout << "\"Back for more eh?\"" << std::endl;
+            std::cout << "said the little Goblin standing in front of the shelf." << std::endl;
+        }
+        printf("\"%s %d %s\"\n", "We've got", getSize(), "items for sale today!");
+        std::cout << "\"Feel free to look around and see if there is anything interests you.\"" << std::endl;
+    }
+
+    void printItem(GameClient *client, Player *player, const int &index) override {
+        if (index < 0 || index > getSize() - 1) {
+            throw std::invalid_argument("Invalid index: " + std::to_string(index));
+        }
+        ShopItem item = items[index];
+        Card* card = item.getCard();
+        Optional<CardTemplate*> optionalTemplate = client->getCardTemplates()->get(card->getTemplateId());
+        if (optionalTemplate.isEmpty()) {
+            throw std::logic_error("Invalid card template: " + std::to_string(card->getTemplateId()));
+        }
+        std::cout << std::endl;
+        printf("%s %d", "Item", index);
+        CardTemplate* cardTemplate = *optionalTemplate.value();
+        cardTemplate->displayCard(card);
+        printf("%s: %d\n", "Cost", item.getGoldCost());
+    }
+
+};
+
+Shop* newShop(const int &size) {
+    return new SimpleShop{size};
 }

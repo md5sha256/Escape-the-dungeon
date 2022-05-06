@@ -11,6 +11,7 @@
 class JsonDatabase : public Database {
 
     private:
+    const char *GLOBAL_CARD_ID = "global-card-id";
     const char *TEMPLATE_ID = "templateId";
     const char *CARD_ID = "id";
     const char *INT_ATTRIBUTES = "int-attributes";
@@ -22,8 +23,21 @@ class JsonDatabase : public Database {
     const char *GOLD = "gold";
     const char *PATH = "path";
     const char *PATH_POSITION = "path-pos";
-    const char *DECK = "deck";
     const char *INVENTORY = "inventory";
+
+    int lastCardId = 0;
+
+    void initGlobalIds(rapidjson::Document &document) {
+        auto cardId = document.FindMember(GLOBAL_CARD_ID);
+        if (cardId != document.MemberEnd()) {
+            lastCardId = cardId->value.GetInt();
+        }
+    }
+
+    void saveGlobalIds(rapidjson::Document &document) {
+        rapidjson::Value value(lastCardId);
+        document.AddMember(rapidjson::StringRef(GLOBAL_CARD_ID), value, document.GetAllocator());
+    }
 
     protected:
     rapidjson::Value serialize_card(Card *card, rapidjson::Document::AllocatorType &alloc) {
@@ -180,7 +194,6 @@ class JsonDatabase : public Database {
     }
 
     void savePlayer(rapidjson::Document &document, Player &player) {
-        document.SetObject();
         rapidjson::Value name(player.getName().data(), document.GetAllocator());
         rapidjson::Value gold(player.getGold());
         rapidjson::Value path = serializeInts(player.getPath(), document.GetAllocator());
@@ -194,7 +207,6 @@ class JsonDatabase : public Database {
         document.AddMember(rapidjson::StringRef(PATH_POSITION), pos, alloc);
         document.AddMember(rapidjson::StringRef(ATTRIBUTES), attributes, alloc);
         document.AddMember(rapidjson::StringRef(SKILL_POINTS), skillPoints, alloc);
-        saveCards(document, player.getCurrentDeck(), DECK);
         saveCards(document, player.getInventory(), INVENTORY);
     }
 
@@ -222,16 +234,6 @@ class JsonDatabase : public Database {
             auto attrs = deserializeAttributes(attributes->value);
             player->setAttributes(attrs);
         }
-        auto deck = document.FindMember(DECK);
-        if (deck != document.MemberEnd()) {
-            auto cards = loadCards(deck->value);
-            player->setDeck(cards);
-        }
-        auto inventory = document.FindMember(INVENTORY);
-        if (inventory != document.MemberEnd()) {
-            auto cards = loadCards(inventory->value);
-            player->setInventory(cards);
-        }
         return Optional<Player>{player};
     }
 
@@ -248,11 +250,17 @@ class JsonDatabase : public Database {
         rapidjson::Document data;
         data.ParseStream(databaseWrapper);
         databaseFile.close();
+        if (!data.IsObject()) {
+            return nullopt<Player>();
+        }
+        initGlobalIds(data);
         return loadPlayer(data);
     }
 
     void save(const std::string &path, Player &player) noexcept(false) override {
         rapidjson::Document data;
+        data.SetObject();
+        saveGlobalIds(data);
         savePlayer(data, player);
         std::ofstream databaseFile;
 
@@ -262,6 +270,10 @@ class JsonDatabase : public Database {
         writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatSingleLineArray);
         data.Accept(writer);
         databaseFile.close();
+    }
+
+    Card *createCard(const int &templateId) noexcept(true) override {
+        return new Card{lastCardId++, templateId};
     }
 };
 

@@ -49,14 +49,14 @@ class SimpleExecutor : public CommandExecutor {
         return true;
     }
 
-    bool executeCommand(Player &player, const CommandData &data) noexcept(false) override {
+    bool executeCommand(Player *player, const CommandData &data) noexcept(false) override {
         Optional<Command> optionalCmd = findCommand(data.getCommandName());
         if (optionalCmd.isEmpty()) {
             return false;
         }
         Command *command = optionalCmd.value();
         std::vector<string> args = data.getArgs();
-        return command->onCommand(player, args);
+        return command->onCommand( player, args);
     }
 };
 

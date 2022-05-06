@@ -7,6 +7,16 @@
 #include <vector>
 #include <map>
 #include "utils/optional.hpp"
+#include "algorithm"
+
+const int DEFAULT_PLAYER_HEALTH = 10;
+
+const int BATTLE_PATH = 0;
+const int CAMPFIRE_PATH = 1;
+const int SHOP_PATH = 2;
+const int EVENT_PATH = 3;
+const int BOSS_PATH = 4;
+const int WIN_PATH = 5;
 
 struct Card {
 
@@ -146,11 +156,16 @@ struct Entity {
         return attributes[attribute];
     }
 
-    void modifyAttribute(const Attribute attribute, const int &amt) {
-        attributes[attribute] += amt;
-        if (attributes[attribute] < 0) {
-            attributes[attribute] = 0;
+    int modifyAttribute(const Attribute attribute, const int &amt) {
+        int &ref = attributes[attribute];
+        ref += amt;
+        if (ref < 0) {
+            int diff = amt - ref;
+            // Min value for all attributes is 0
+            ref = 0;
+            return diff;
         }
+        return amt;
     }
 
     [[nodiscard]] std::map<Attribute, int> getAttributes() const noexcept(true) {
@@ -171,6 +186,10 @@ struct Entity {
         std::cout << "Defence: " << getAttribute(DEFENCE) << std::endl;
     }
 
+    void kill() {
+        attributes[Attribute::HEALTH] = 0;
+    }
+
     bool isDead() {
         return getAttribute(HEALTH) <= 0;
     }
@@ -183,7 +202,9 @@ struct Entity {
         if (defence < damage) {
             // We deal the overflow to the health
             int healthDmg = damage - defence;
-            modifyAttribute(HEALTH, -healthDmg);
+            int healthMod = modifyAttribute(HEALTH, -healthDmg);
+            // We only print damage done to health and not defence
+            printf("%s %s %d %s", getName().data(), "suffered", -healthMod, "health damage");
         }
     }
 
@@ -196,7 +217,6 @@ struct Player : public Entity {
     int gold = 0;
     std::vector<int> path;
     int position = 0;
-    std::vector<Card*> currentDeck;
     std::vector<Card*> inventory;
 
     public:
@@ -207,21 +227,24 @@ struct Player : public Entity {
 
     }
 
-    std::vector<Card*> getCurrentDeck() {
-        return currentDeck;
-    }
-
-    void setDeck(const std::vector<Card*> &deck) {
-        currentDeck = deck;
-    }
-
     std::vector<Card*> getInventory() {
         return inventory;
     }
 
-    void setInventory(const std::vector<Card*> &_inventory) {
-        inventory = _inventory;
+    void addCardToInventory(Card *card) {
+        inventory.push_back(card);
     }
+
+    bool removeCardFromInventory(Card* card) {
+        auto iter = std::find(inventory.begin(), inventory.end(), card);
+        if (iter != inventory.end()) {
+            inventory.erase(iter);
+            delete card;
+            return true;
+        }
+        return false;
+    }
+
 
     std::vector<int> getPath() {
         return path;
@@ -283,7 +306,7 @@ struct Player : public Entity {
         std::cout << "Skill Points: " << skill_points << std::endl;
     }
 
-    void print_map() {
+    void printMap() {
         for (int i = 0; i < 10; i++) {
             if (i != position) {
                 if (path[i] == 0)
@@ -403,11 +426,11 @@ inline Entity generateRandomEnemy() {
     return Entity{name, attrs};
 }
 
-inline void allocateSkillPoints(Player &player) {
+inline void allocateSkillPoints(Player *player) {
     typedef Entity::Attribute Attribute;
-    player.printUnallocatedSkillPoints();
+    player->printUnallocatedSkillPoints();
     std::string input;
-    while (player.getSkillPoints() > 0) {
+    while (player->getSkillPoints() > 0) {
         std::cout << "Input a number(1: Attack, 2: HP, 3: Defence): ";
         std::cin >> input;
         Attribute toModify;
@@ -423,8 +446,8 @@ inline void allocateSkillPoints(Player &player) {
             std::cout << "Please enter a valid number." << std::endl;
             continue;
         }
-        player.modifyAttribute(toModify, 1);
-        player.modifySkillPoints(-1);
+        player->modifyAttribute(toModify, 1);
+        player->modifySkillPoints(-1);
     }
 }
 
@@ -432,8 +455,8 @@ Player *initPlayer();
 
 void performGreetBack(Player *player);
 
-void randomEvent(Player &p);
+void randomEvent(Player *p);
 void boss(Player p);
-void campfire(Player &p);
+void campfire(Player *p);
 
 #endif//PLAYERINFO_HPP

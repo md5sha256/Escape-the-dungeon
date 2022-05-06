@@ -4,6 +4,8 @@
 #include "../playerinfo.hpp"
 #include "string"
 #include "battle.hpp"
+#include "registry.hpp"
+#include "database.hpp"
 
 class GameClient {
 
@@ -23,6 +25,11 @@ class GameClient {
     [[nodiscard]] virtual Player *getPlayer() const noexcept(true) = 0;
 
     [[nodiscard]] virtual BattleHandler *getBattleHandler() const noexcept(true) = 0;
+
+    [[nodiscard]] virtual Registry<int, CardTemplate*> *getCardTemplates() const noexcept(true) = 0;
+
+    [[nodiscard]] virtual Database *getDatabase() const noexcept(true) = 0;
+
 
 };
 

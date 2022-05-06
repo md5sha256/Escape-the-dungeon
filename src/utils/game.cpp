@@ -1,10 +1,10 @@
 #include "game.hpp"
 
+#include "cardtemplates.hpp"
 #include "command_executor.hpp"
 #include "command_parser.hpp"
 #include "commands.hpp"
 #include "database.hpp"
-#include "registry.hpp"
 
 class SimpleGameClient : public GameClient {
 
@@ -13,6 +13,7 @@ class SimpleGameClient : public GameClient {
     Database *database = nullptr;
     Player *player = nullptr;
     BattleHandler *battleHandler = nullptr;
+    Registry<int, CardTemplate *> *templateRegistry = nullptr;
 
     bool running = false;
 
@@ -50,9 +51,27 @@ class SimpleGameClient : public GameClient {
         Command *echoCommand = new EchoCommand;
         Command *exitCommand = new ExitCommand(this);
         Command *skillsCommand = new SkillCommand;
+        Command *skipCommand = new SkipCommand;
+        Command *shopComamnd = new ShopCommand(this);
         commandExecutor->registerCommand(echoCommand);
         commandExecutor->registerCommand(exitCommand);
         commandExecutor->registerCommand(skillsCommand);
+        commandExecutor->registerCommand(skipCommand);
+        commandExecutor->registerCommand(shopComamnd);
+    }
+
+    void registerTemplates() noexcept(false) {
+        validateState();
+        CardTemplate *skillPointTemplate = new SkillPointCardTemplate;
+        CardTemplate *damageTemplate = new DamageCardTemplate(this);
+        CardTemplate *teleportTemplate = new TeleportCardTemplate(this);
+        CardTemplate *winBattleTemplate = new WinBattleCardTemplate(this);
+        CardTemplate *reviveTemplate = new ReviveCardTemplate;
+        templateRegistry->add(skillPointTemplate->getId(), skillPointTemplate);
+        templateRegistry->add(damageTemplate->getId(), damageTemplate);
+        templateRegistry->add(teleportTemplate->getId(), teleportTemplate);
+        templateRegistry->add(winBattleTemplate->getId(), winBattleTemplate);
+        templateRegistry->add(reviveTemplate->getId(), reviveTemplate);
     }
 
     bool awaitUserInput() {
@@ -65,7 +84,7 @@ class SimpleGameClient : public GameClient {
                 return true;
             }
             try {
-                commandExecutor->executeCommand(*player, commandData);
+                commandExecutor->executeCommand(player, commandData);
             } catch (CommandExecutionError &ex) {
                 printf("%s\n", "An unexpected error occurred when handling the previous command");
                 std::cerr << ex.what() << std::endl;
@@ -80,32 +99,41 @@ class SimpleGameClient : public GameClient {
     void checkPosition() {
         if (player->getPosition() < 10) {
             switch (player->getPathAtPosition()) {
-                case 0: {
+                case BATTLE_PATH: {
+                    std::cout << "battle placeholder" << std::endl;
+                    player->incrementPosition();
+                    break;
+                }
+                case CAMPFIRE_PATH: {
+                    //when campfire is encountered
+                    campfire(player);
+                    // Move the player along
+                    player->incrementPosition();
+                    break;
+                }
+                case SHOP_PATH: {
+                    std::cout << player->getName() << " arrived at a shop!" << std::endl;
+                    std::cout << "run /shop to continue" << std::endl;
+                    std::cout << "run /skip to skip this shop" << std::endl;
+                    break;
+                }
+                case EVENT_PATH: {
+                    // when random event is encountered
+                    randomEvent(player);
+                    // MOve the player along
+                    player->incrementPosition();
+                    break;
+                }
+                case BOSS_PATH: {
+                    // when boss is encountered
                     std::cout << "battle placeholder" << std::endl;
                     break;
                 }
-                case 1: {
-                    //when campfire is encountered
-                    campfire(*player);
-                    break;
-                }
-                case 2: {
-                    // when shop is encountered
-                    std::cout << "shop placeholder" << std::endl;
-                    break;
-                }
-                case 3: {
-                    // when random event is encountered
-                    std::cout << "random event placeholder" << std::endl;
-                    break;
-                }
-                case 4: {
-                    std::cout << "boss placeholder" << std::endl;
-                    // when boss is encountered
-                    break;
+                case WIN_PATH: {
+                    std::cout << "win placeholder" << std::endl;
+                    return;
                 }
             }
-            player->incrementPosition();
         }
     }
 
@@ -131,6 +159,7 @@ class SimpleGameClient : public GameClient {
         }
         commandExecutor = newCmdExecutor();
         commandParser = newCmdParser();
+        templateRegistry = newRegistry<int, CardTemplate *>();
         battleHandler = new BattleHandler;
         database = newDatabase(dataDir);
     }
@@ -141,6 +170,7 @@ class SimpleGameClient : public GameClient {
         }
         running = true;
 
+        registerTemplates();
         registerCommands();
         loadData();
         while (running) {
@@ -166,11 +196,17 @@ class SimpleGameClient : public GameClient {
         return player;
     }
 
-
     [[nodiscard]] BattleHandler *getBattleHandler() const noexcept(true) override {
         return battleHandler;
     }
 
+    [[nodiscard]] Registry<int, CardTemplate *> *getCardTemplates() const noexcept(true) override {
+        return templateRegistry;
+    }
+
+    [[nodiscard]] Database *getDatabase() const noexcept(true) override {
+        return database;
+    }
 };
 
 GameClient *newGameClient(const std::string &rootDir) noexcept(true) {

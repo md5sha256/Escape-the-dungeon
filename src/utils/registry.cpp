@@ -14,11 +14,11 @@ class SimpleRegistry : public Registry<K, V> {
 
     ~SimpleRegistry() override = default;
 
-    bool isRegistered(K &key) const noexcept(true) override {
+    bool isRegistered(const K &key) const noexcept(true) override {
         return data.find(key) != data.end();
     }
 
-    bool add(K &key, V &value) override {
+    bool add(const K &key, const V &value) override {
         if (!isRegistered(key)) {
             data[key] = value;
             return true;
@@ -26,14 +26,14 @@ class SimpleRegistry : public Registry<K, V> {
         return false;
     }
 
-    void remove(K &key) override {
+    void remove(const K &key) override {
         auto iter = data.find(key);
         if (iter != data.end()) {
             data.erase(iter);
         }
     }
 
-    Optional<V> get(K &key) override {
+    Optional<V> get(const K &key) override {
         auto iter = data.find(key);
         if (iter == data.end()) {
             return nullopt<V>();

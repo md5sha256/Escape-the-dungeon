@@ -13,13 +13,13 @@ class Registry {
     public:
     virtual ~Registry() = default;
 
-    virtual bool isRegistered(K &key) const noexcept(true) = 0;
+    virtual bool isRegistered(const K &key) const noexcept(true) = 0;
 
-    virtual bool add(K &key, V &value) = 0;
+    virtual bool add(const K &key, const V &value) = 0;
 
-    virtual void remove(K &key) = 0;
+    virtual void remove(const K &key) = 0;
 
-    virtual Optional<V> get(K &key) = 0;
+    virtual Optional<V> get(const K &key) = 0;
 
     virtual std::map<K, V> toMap() const noexcept(true) = 0;
 };

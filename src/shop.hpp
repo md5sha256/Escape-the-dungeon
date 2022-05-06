@@ -2,6 +2,7 @@
 #define SHOP_HPP
 
 #include "playerinfo.hpp"
+#include "utils/game.hpp"
 
 struct ShopItem {
 
@@ -15,13 +16,61 @@ struct ShopItem {
     int gold_cost;
 
     public:
-    Card *getCard() const {
+    [[nodiscard]] Card *getCard() const {
         return card;
     }
 
-    int getGoldCost() const {
+    [[nodiscard]] int getGoldCost() const {
         return gold_cost;
     }
 };
 
-#endif//ESCAPE_THE_DUNGEON_SHOP_HPP
+class Shop {
+
+    private:
+    int size;
+    protected:
+    std::vector<ShopItem> items;
+
+    explicit Shop(const int &_size) {
+        size = _size;
+    }
+
+    void removeItem(int index) {
+        if (index < 0 || index > size - 1) {
+            return;
+        }
+        items.erase(items.begin() + index);
+    }
+
+    public:
+    virtual ~Shop() = default;
+
+    [[nodiscard]] int getOriginalSize() const noexcept(true) {
+        return size;
+    }
+
+    [[nodiscard]] int getSize() const noexcept(true) {
+        return (int) items.size();
+    }
+
+
+    std::vector<ShopItem> getItems() {
+        return items;
+    }
+
+    virtual void generateItems(GameClient *client) = 0;
+
+    virtual void buyItem(Player *player, int index) = 0;
+
+    virtual void greetPlayer(Player *player) = 0;
+
+    virtual void printItem(GameClient *client, Player *player, const int &index) = 0;
+
+};
+
+Shop *newShop(const int &size);
+
+
+
+#endif//SHOP_HPP

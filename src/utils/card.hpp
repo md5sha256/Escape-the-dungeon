@@ -6,7 +6,6 @@
 #define CARD_HPP
 
 #include "../playerinfo.hpp"
-#include "game.hpp"
 
 class CardTemplate {
 
@@ -24,7 +23,25 @@ class CardTemplate {
         return id;
     }
 
-    virtual void onCardUse(GameClient *client, Player &player, Card &cardData) = 0;
+    virtual bool onCardUse(Player *player, Card *cardData) {
+        return true;
+    }
+
+    virtual void displayCard(Card *card) {
+
+    }
+
+    virtual void initCard(Card *card) {
+
+    }
+
+    static bool checkDead(Player *player) {
+        if (player->isDead()) {
+            std::cout << "You may not use this card whilst dead!" << std::endl;
+            return true;
+        }
+        return false;
+    }
 };
 
 #endif//CARD_HPP

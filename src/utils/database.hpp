@@ -14,12 +14,10 @@ class Database {
 
     std::string root;
 
-    Registry<int, CardTemplate *> *templates;
     std::vector<Card *> *cardInventory;
     std::vector<Card *> *cardDeck;
 
     explicit Database(const std::string &rootPath) {
-        templates = new SimpleRegistry<int, CardTemplate *>();
         cardInventory = new std::vector<Card *>;
         cardDeck = new std::vector<Card *>;
         root = rootPath;
@@ -27,22 +25,14 @@ class Database {
 
     public:
     ~Database() {
-        for (auto pair : templates->toMap()) {
-            delete pair.second;
-        }
         for (auto ptr : *cardDeck) {
             delete ptr;
         }
         for (auto ptr : *cardInventory) {
             delete ptr;
         }
-        delete templates;
         delete cardInventory;
         delete cardDeck;
-    }
-
-    Registry<int, CardTemplate *> *getTemplates() {
-        return templates;
     }
 
     Optional<Player> load() noexcept(false) {
@@ -53,6 +43,12 @@ class Database {
 
     void save(Player &player) noexcept(false) {
         save(root, player);
+    }
+
+    virtual Card *createCard(const int &templateId) noexcept(true) = 0;
+
+    Card *createCard(CardTemplate *cardTemplate) noexcept(true) {
+        return createCard(cardTemplate->getId());
     }
 
     virtual void save(const std::string &path, Player &player) noexcept(false) = 0;

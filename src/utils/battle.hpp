@@ -29,7 +29,7 @@ struct Battle {
         return entity;
     }
 
-    bool isValid() const {
+    [[nodiscard]] bool isValid() const {
         return !player->isDead() && !entity->isDead();
     }
 };

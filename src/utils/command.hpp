@@ -73,7 +73,7 @@ class Command {
      * @param args The arguments in the order they were passed
      * @return Return true if the command was executed successfully, false otherwise
      */
-    virtual bool onCommand(Player &player, std::vector<std::string> &args) noexcept(false) {
+    virtual bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) {
         return true;
     }
 
