@@ -213,7 +213,7 @@ struct Entity {
 struct Player : public Entity {
 
     private:
-    int skill_points = 5;
+    int skill_points = 0;
     int gold = 0;
     std::vector<int> path;
     int position = 0;
