@@ -54,7 +54,7 @@ class SimpleShop : public Shop {
     void generateItems(GameClient *client) override {
         items.clear();
         items.reserve(getSize());
-        for (int i = 0; i < getSize(); i++) {
+        for (int i = 0; i < getOriginalSize(); i++) {
             items[i] = generateShopItem(client);
         }
     }
