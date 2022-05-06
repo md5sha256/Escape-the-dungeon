@@ -12,23 +12,29 @@ void buy_item(Player &p, Card *card, int gold_cost) {
     if (p.getGold() >= gold_cost) {
         p.getInventory().push_back(card);
         p.modifyGold(-gold_cost);
-        cout << "Thank you for your purchase!" << endl
+        cout << "\"Yes! it would definately help your journey in the dungeon!\"" << endl
              << "You have " << p.getGold() << " left." << endl;
     } else
-        cout << "Sorry, you don't have enough gold" << endl;
+        cout << "\"Doesn't look like your wallet is ready for this..\"" << endl;
 }
 
 void shop(Player &p) {
     string input;
     vector<ShopItem> goods;
-    cout << p.getName() << " found a shop. There is different card that can be bought." << endl;
+    cout << p.getName() << " found a house, with a signboard written:\"7/24 business\"" << endl;
     vector<ShopItem> item;
+    item=generate_shop_item();
+	cout<<"You have "<<p.gold<<" gold."<<endl;
+    int buy_count=0;//the number of time player enters /buy command.
     while (true) {
-        shop_item_print();
-        cout << "You have " << p.getGold() << " gold." << endl
-             << "Would you like to buy? (/Buy) or skip (/skip): ";
+        cout<<"Would you like to take a look inside? (/buy) or leave (/skip): ";
         cin >> input;
         if (input == "/buy") {
+            buy_count+=1;
+            if (buy_count==0)//Welcome from shop owner for the first time entering the shop
+            cout << "\"Oh, a human! Haven't seen one in quite a few years, what can I help you?\""<<endl<<"said a little Goblin standing in front of a shelf.";
+            cout << "\"Free free to look around and see if there is anything interests you.\""<<endl;
+            shop_item_print();
             while (true) {
                 cout << "Enter the item ID that you want to buy or enter /back to cancel the action: ";
                 cin >> input;
