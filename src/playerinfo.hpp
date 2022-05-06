@@ -173,9 +173,9 @@ struct Entity {
     }
 
     void setAttributes(std::map<Attribute, int> &_attributes) noexcept(true) {
-        attributes.clear();
         attributes = std::map<Attribute, int>(defAttrs);
-        for (auto pair : attributes) {
+        for (auto pair : _attributes) {
+            std::cout << pair.second << std::endl;
             attributes[pair.first] = pair.second;
         }
     }
@@ -243,6 +243,10 @@ struct Player : public Entity {
             return true;
         }
         return false;
+    }
+
+    void setInventory(const std::vector<Card*> &inv) {
+        inventory = inv;
     }
 
 

@@ -135,7 +135,7 @@ class JsonDatabase : public Database {
         return ret;
     }
 
-    rapidjson::Value serializeInts(const std::vector<int> &ints, rapidjson::Document::AllocatorType &allocator) {
+    static rapidjson::Value serializeInts(const std::vector<int> &ints, rapidjson::Document::AllocatorType &allocator) {
         rapidjson::Value ret;
         ret.SetArray();
         auto array = ret.GetArray();
@@ -145,7 +145,7 @@ class JsonDatabase : public Database {
         return ret;
     }
 
-    std::vector<int> deserializeInts(const rapidjson::Value &value) {
+    static std::vector<int> deserializeInts(const rapidjson::Value &value) {
         std::vector<int> ret;
         if (!value.IsArray()) {
             return ret;
@@ -160,7 +160,7 @@ class JsonDatabase : public Database {
         return ret;
     }
 
-    rapidjson::Value serializeAttributes(const std::map<Entity::Attribute, int> &attributes, rapidjson::Document::AllocatorType &allocator) {
+    static rapidjson::Value serializeAttributes(const std::map<Entity::Attribute, int> &attributes, rapidjson::Document::AllocatorType &allocator) {
         rapidjson::Value ret;
         ret.SetObject();
         for (auto pair : attributes) {
@@ -172,7 +172,7 @@ class JsonDatabase : public Database {
         return ret;
     }
 
-    std::map<Entity::Attribute, int> deserializeAttributes(rapidjson::Value &value) {
+    static std::map<Entity::Attribute, int> deserializeAttributes(rapidjson::Value &value) {
         std::map<Entity::Attribute, int> ret;
         auto iter = value.MemberBegin();
         while (iter != value.MemberEnd()) {
@@ -231,8 +231,15 @@ class JsonDatabase : public Database {
         }
         auto attributes = document.FindMember(ATTRIBUTES);
         if (attributes != document.MemberEnd()) {
+            std::cout << "Loading attributes" << std::endl;
             auto attrs = deserializeAttributes(attributes->value);
+            std::cout << "Size: " << attrs.size() << std::endl;
             player->setAttributes(attrs);
+        }
+        auto inventory = document.FindMember(INVENTORY);
+        if (inventory != document.MemberEnd()) {
+            auto cards = loadCards(inventory->value);
+            player->setInventory(cards);
         }
         return Optional<Player>{player};
     }
