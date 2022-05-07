@@ -261,7 +261,7 @@ class BattleCommand : public Command {
         }
         Optional<Entity> opponent = battle->getCurrentOpponent();
         if (opponent.isPresent()) {
-            battle->printOpponent(opponent.value());
+            battle->printOpponent(*opponent.value());
         }
         std::cout << std::endl;
     }
@@ -294,7 +294,7 @@ class BattleCommand : public Command {
             return true;
         }
         Entity *opponent = optionalEnemy.value();
-        opponent->takeDamage(player->getAttribute(Entity::Attribute::ATTACK));
+        opponent->takeDamage(player->getAttribute(Attribute::ATTACK));
         if (opponent->isDead()) {
             std::cout << player->getName() << " has killed the " << opponent->getName() << std::endl;
         }

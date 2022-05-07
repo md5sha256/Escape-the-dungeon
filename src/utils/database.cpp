@@ -160,7 +160,7 @@ class JsonDatabase : public Database {
         return ret;
     }
 
-    static rapidjson::Value serializeAttributes(const std::map<Entity::Attribute, int> &attributes, rapidjson::Document::AllocatorType &allocator) {
+    static rapidjson::Value serializeAttributes(const std::map<Attribute, int> &attributes, rapidjson::Document::AllocatorType &allocator) {
         rapidjson::Value ret;
         ret.SetObject();
         for (auto pair : attributes) {
@@ -172,14 +172,14 @@ class JsonDatabase : public Database {
         return ret;
     }
 
-    static std::map<Entity::Attribute, int> deserializeAttributes(rapidjson::Value &value) {
-        std::map<Entity::Attribute, int> ret;
+    static std::map<Attribute, int> deserializeAttributes(rapidjson::Value &value) {
+        std::map<Attribute, int> ret;
         auto iter = value.MemberBegin();
         while (iter != value.MemberEnd()) {
             auto key = &iter->name;
             auto val = &iter->value;
             std::string rawAttr = key->GetString();
-            Entity::Attribute attribute;
+            Attribute attribute;
             try {
                 attribute = Entity::getAttribute(rawAttr);
             } catch (std::invalid_argument &ex) {

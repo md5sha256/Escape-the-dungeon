@@ -21,20 +21,11 @@ struct Battle {
         }
     }
 
-    ~Battle() {
-        for (const auto ptr : enemies) {
-            delete ptr;
-        }
-        enemies.clear();
-    }
+    ~Battle() = default;
 
     public:
     [[nodiscard]] Player *getPlayer() const {
         return player;
-    }
-
-    [[nodiscard]] std::vector<Entity*> getEnemies() const {
-        return std::vector<Entity*>{enemies.begin(), enemies.end()};
     }
 
     [[nodiscard]] int getNumEnemies() const {
@@ -45,7 +36,8 @@ struct Battle {
         if (enemies.empty()) {
             return nullopt<Entity>();
         }
-        return Optional<Entity>{enemies.front()};
+        Entity *entity = enemies.front();
+        return Optional<Entity>{entity};
     }
 
     Battle* update() noexcept(true) {
@@ -54,18 +46,18 @@ struct Battle {
             Entity *enemy = current.value();
             if (enemy->isDead()) {
                 enemies.pop_front();
+                // Free up the enemy as they are no longer needed
+                delete enemy;
             }
-            // Free up the enemy as they are no longer needed
-            delete enemy;
         }
         return this;
     }
 
-    void printOpponent(Entity *entity) const {
-        std::cout << "A " << entity->getName() << " steps up to challenge " << player->getName() << std::endl;
-        std::cout << entity->getName() << "'s stats:" << std::endl;
-        entity->printAttribute(Entity::Attribute::HEALTH);
-        entity->printAttribute(Entity::Attribute::ATTACK);
+    void printOpponent(Entity &entity) const {
+        std::cout << "A " << entity.getName() << " steps up to challenge " << player->getName() << std::endl;
+        std::cout << entity.getName() << "'s stats:" << std::endl;
+        entity.printAttribute(Attribute::HEALTH);
+        entity.printAttribute(Attribute::ATTACK);
     }
 
     [[nodiscard]] bool isValid() const {

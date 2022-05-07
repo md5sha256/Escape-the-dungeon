@@ -14,8 +14,7 @@ std::vector<Entity*> generateEnemies() {
     return enemies;
 }
 
-Entity* generateRandomEnemy() {
-    typedef Entity::Attribute Attribute;
+Entity *generateRandomEnemy() {
     int attack = (rand() % 5) + 1;
     int defence = (rand() % 5) + 1;
     int hp = (rand() % 4) + 1;
@@ -34,7 +33,7 @@ Entity* generateRandomEnemy() {
     else//if somewhere balance
         name += "Shrem";
     std::map<Attribute, int> attrs = {{Attribute::HEALTH, hp}, {Attribute::ATTACK, attack}, {Attribute ::DEFENCE, defence}};
-    return new Entity(name, attrs);
+    return new Entity{name, attrs};
 }
 
 bool startBattle(Player *player, BattleHandler *handler) {

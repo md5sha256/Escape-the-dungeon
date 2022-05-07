@@ -101,16 +101,15 @@ struct Card {
 
 };
 
+enum Attribute {
+
+    HEALTH,
+    ATTACK,
+    DEFENCE,
+
+};
+
 struct Entity {
-
-    public:
-    enum Attribute {
-
-        HEALTH,
-        ATTACK,
-        DEFENCE,
-
-    };
 
     static std::string getAttributeName(const Attribute &attr) {
         switch(attr) {
@@ -135,38 +134,35 @@ struct Entity {
 
     private:
     std::string name;
-    std::map<Attribute, int> defAttrs = {{Attribute::ATTACK, 0}, {Attribute::HEALTH, 0}, {Attribute::DEFENCE, 0}};
-    std::map<Attribute, int> attributes = std::map<Attribute, int>(defAttrs);
+    std::map<Attribute, int> attributes = {{Attribute::ATTACK, 0}, {Attribute::HEALTH, 0}, {Attribute::DEFENCE, 0}};
 
     public:
     explicit Entity(const std::string &_name) {
-        std::cout << _name << " was created!" << std::endl;
         name = _name;
     }
 
     Entity(const std::string &_name, const std::map<Attribute, int> &attrs) : Entity(_name){
-        for (auto pair : attrs) {
-            attributes[pair.first] = pair.second;
-        }
+        printAHD();
     }
 
     [[nodiscard]] std::string getName() const noexcept {
         return name;
     }
 
-    [[nodiscard]] int getAttribute(const Attribute attribute) {
+    [[nodiscard]] int getAttribute(Attribute attribute) {
         return attributes[attribute];
     }
 
-    int modifyAttribute(const Attribute attribute, const int &amt) {
-        int &ref = attributes[attribute];
+    int modifyAttribute(Attribute attribute, const int &amt) {
+        int ref = attributes[attribute];
         ref += amt;
         if (ref < 0) {
             int diff = amt - ref;
             // Min value for all attributes is 0
-            ref = 0;
+            attributes[attribute] = 0;
             return diff;
         }
+        attributes[attribute] = ref;
         return amt;
     }
 
@@ -175,7 +171,6 @@ struct Entity {
     }
 
     void setAttributes(std::map<Attribute, int> &_attributes) noexcept(true) {
-        attributes = std::map<Attribute, int>(defAttrs);
         for (auto pair : _attributes) {
             std::cout << pair.second << std::endl;
             attributes[pair.first] = pair.second;
@@ -212,7 +207,8 @@ struct Entity {
             actual = -modifyAttribute(HEALTH, -healthDmg);
         }
         // We only print damage done to health and not defence
-        printf("%s %s %d %s\n", getName().data(), "suffered", -actual, "health damage");
+        const char* _name = name.c_str();
+        printf("%s %s %d %s\n", _name, "suffered", -actual, "health damage");
     }
 
 };
@@ -425,7 +421,6 @@ struct Path {
 };
 
 inline void allocateSkillPoints(Player *player) {
-    typedef Entity::Attribute Attribute;
     player->printUnallocatedSkillPoints();
     std::string input;
     while (player->getSkillPoints() > 0) {

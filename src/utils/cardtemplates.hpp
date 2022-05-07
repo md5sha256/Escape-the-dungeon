@@ -249,7 +249,7 @@ class ReviveCardTemplate : public CardTemplate {
             std::cout << "You can only revive yourself if you are dead!" << std::endl;
             return false;
         }
-        player->modifyAttribute(Entity::Attribute::HEALTH, DEFAULT_PLAYER_HEALTH);
+        player->modifyAttribute(Attribute::HEALTH, DEFAULT_PLAYER_HEALTH);
         std::cout << player->getName() << " was revived! The fight goes on..." << std::endl;
         return true;
     }

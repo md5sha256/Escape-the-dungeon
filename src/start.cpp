@@ -4,7 +4,6 @@
 #include <string>
 
 Player* initPlayer() {
-    typedef Entity::Attribute Attribute;
     std::string name;
     std::cout << "Please enter your name: ";
     std::cin >> name;

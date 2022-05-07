@@ -35,7 +35,6 @@ void event1(Player *p) {
 }
 
 void event2(Player *p) {
-    typedef Entity::Attribute Attribute;
     std::cout << p->getName() << " found a Trevi fountain " << std::endl
          << "You can choose to: 1. Throw 10 gold into the Fountain || 2. Leave" << std::endl;
     std::cout << "Your choice(Enter the number): ";
@@ -53,15 +52,15 @@ void event2(Player *p) {
                 switch(type) {
                     case 0:
                         // Boost health
-                        toModify = Attribute::HEALTH;
+                        toModify = HEALTH;
                         break;
                     case 1:
                         // Boost attack
-                        toModify = Attribute::ATTACK;
+                        toModify = ATTACK;
                         break;
                     case 2:
                         // Boost defence
-                        toModify = Attribute::DEFENCE;
+                        toModify = DEFENCE;
                         break;
                     default:
                         throw std::invalid_argument("Invalid type: " + std::to_string(type));
