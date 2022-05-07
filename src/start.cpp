@@ -14,6 +14,7 @@ Player* initPlayer() {
     player->modifyAttribute(Attribute::HEALTH, DEFAULT_PLAYER_HEALTH);
     player->modifyAttribute(Attribute::ATTACK, 1);
     player->modifyAttribute(Attribute::DEFENCE, 0);
+    player->addSkillPoints(5);
     allocateSkillPoints(player);
     Path g;
     g.generate();

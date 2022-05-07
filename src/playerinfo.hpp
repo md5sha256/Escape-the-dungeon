@@ -186,6 +186,10 @@ struct Entity {
         std::cout << "Defence: " << getAttribute(DEFENCE) << std::endl;
     }
 
+    void printAttribute(Attribute attr) {
+        printf("%s: %d\n", getAttributeName(attr).data(), getAttribute(attr));
+    }
+
     void kill() {
         attributes[Attribute::HEALTH] = 0;
     }
@@ -199,13 +203,14 @@ struct Entity {
         // Use up the defence points first
         modifyAttribute(DEFENCE, -damage);
         // Min value for all attributes is 0
+        int actual(0);
         if (defence < damage) {
             // We deal the overflow to the health
             int healthDmg = damage - defence;
-            int healthMod = modifyAttribute(HEALTH, -healthDmg);
-            // We only print damage done to health and not defence
-            printf("%s %s %d %s", getName().data(), "suffered", -healthMod, "health damage");
+            actual = -modifyAttribute(HEALTH, -healthDmg);
         }
+        // We only print damage done to health and not defence
+        printf("%s %s %d %s", getName().data(), "suffered", -actual, "health damage");
     }
 
 };
@@ -229,6 +234,17 @@ struct Player : public Entity {
 
     std::vector<Card*> getInventory() {
         return inventory;
+    }
+
+    [[nodiscard]] int getInventorySize() const {
+        return inventory.size();
+    }
+
+    Card* getCard(int index) {
+        if (index < 0 || index > inventory.size() - 1) {
+            throw std::invalid_argument("Invalid index: " + std::to_string(index));
+        }
+        return inventory[index];
     }
 
     void addCardToInventory(Card *card) {
@@ -405,30 +421,6 @@ struct Path {
         path3.push_back(4);
     }
 };
-
-
-inline Entity generateRandomEnemy() {
-    typedef Entity::Attribute Attribute;
-    int attack = (rand() % 5) + 1;
-    int defence = (rand() % 5) + 1;
-    int hp = (rand() % 4) + 1;
-    std::string name;
-    //naming of enemy
-    if ((attack + defence) >= 8)//powerful enemy
-        name = "Elite ";
-    else if ((attack + defence) >= 5)//strong enemy
-        name = "Adult ";
-    else//weak enemy
-        name = "Baby";
-    if (defence * 2 <= attack)//if attack is twice as great as defence
-        name += "Zombie";
-    else if (attack * 2 <= defence)//if defence is twice as great as attack
-        name += "Skeleton";
-    else//if somewhere balance
-        name += "Shrem";
-    std::map<Attribute, int> attrs = {{Attribute::HEALTH, hp}, {Attribute::ATTACK, attack}, {Attribute ::DEFENCE, defence}};
-    return Entity{name, attrs};
-}
 
 inline void allocateSkillPoints(Player *player) {
     typedef Entity::Attribute Attribute;

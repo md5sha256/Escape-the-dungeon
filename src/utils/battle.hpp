@@ -10,27 +10,68 @@
 struct Battle {
 
     Player *player;
-    Entity *entity;
+    std::vector<Entity*> enemies;
 
     public:
-    Battle(Player *_player, Entity *_entity) {
+    Battle(Player *_player, const std::vector<Entity*> &opponents) {
         player = _player;
-        entity = _entity;
+        enemies = opponents;
     }
 
-    ~Battle() = default;
+    ~Battle() {
+        for (const auto ptr : enemies) {
+            delete ptr;
+        }
+        enemies.clear();
+    }
 
     public:
     [[nodiscard]] Player *getPlayer() const {
         return player;
     }
 
-    [[nodiscard]] Entity *getEntity() const {
-        return entity;
+    [[nodiscard]] std::vector<Entity*> getEnemies() const {
+        return enemies;
+    }
+
+    [[nodiscard]] int getNumEnemies() const {
+        return enemies.size();
+    }
+
+    [[nodiscard]] Optional<Entity> getCurrentOpponent() const {
+        if (enemies.empty()) {
+            return nullopt<Entity>();
+        }
+        return Optional<Entity>{enemies[0]};
+    }
+
+    Optional<Entity> update() {
+        Optional<Entity> current = getCurrentOpponent();
+        if (current.isPresent()) {
+            Entity *enemy = current.value();
+            if (enemy->isDead()) {
+                enemies.erase(enemies.begin());
+            }
+            // Free up the enemy as they are no longer needed
+            delete enemy;
+        }
+        return getCurrentOpponent();
+    }
+
+    void printOpponent() {
+        Optional<Entity> optional = getCurrentOpponent();
+        if (optional.isEmpty()) {
+            return;
+        }
+        Entity* entity = optional.value();
+        std::cout << "A " << entity->getName() << " steps up to challenge " << player->getName() << std::endl;
+        std::cout << entity->getName() << "'s stats:" << std::endl;
+        entity->printAttribute(Entity::Attribute::HEALTH);
+        entity->printAttribute(Entity::Attribute::ATTACK);
     }
 
     [[nodiscard]] bool isValid() const {
-        return !player->isDead() && !entity->isDead();
+        return !player->isDead() && !enemies.empty();
     }
 };
 
@@ -47,11 +88,11 @@ class BattleHandler {
     }
 
     public:
-    bool startBattle(Player *player, Entity *entity) {
+    bool startBattle(Player *player, const std::vector<Entity*> &opponents) {
         if (currentBattle != nullptr) {
             return false;
         }
-        currentBattle = new Battle{player, entity};
+        currentBattle = new Battle{player, opponents};
         return true;
     }
 
@@ -68,5 +109,11 @@ class BattleHandler {
         currentBattle = nullptr;
     }
 };
+
+Entity *generateRandomEnemy();
+
+std::vector<Entity*> generateEnemies();
+
+bool startBattle(Player *player, BattleHandler *battleHandler);
 
 #endif//BATTLE_HPP

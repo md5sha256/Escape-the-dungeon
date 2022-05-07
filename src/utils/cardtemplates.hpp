@@ -82,8 +82,11 @@ class DamageCardTemplate : public CardTemplate {
             int value = *amount.value();
             Optional<Battle> battleOpt = client->getBattleHandler()->getcurrentBattle();
             if (battleOpt.isPresent()) {
-                Entity *target = battleOpt.value()->entity;
-                target->takeDamage(value);
+                Battle* battle = battleOpt.value();
+                Optional<Entity> opponent = battle->getCurrentOpponent();
+                if (opponent.isPresent()) {
+                    opponent.value()->takeDamage(value);
+                }
                 return true;
             } else {
                 std::cout << "This card can only be used during a battle!" << std::endl;
@@ -197,8 +200,11 @@ class WinBattleCardTemplate : public CardTemplate {
         int random = rand() % 101;
         if (random < value) {
             // The battle was automatically won.
-            battle->entity->kill();
-            std::cout << battle->entity->getName() << " has been killed!";
+            Optional<Entity> opponent = battle->getCurrentOpponent();
+            if (opponent.isPresent()) {
+                opponent.value()->kill();
+                std::cout << opponent.value()->getName() << " has been killed!";
+            }
         } else {
             std::cout << battle->player->getName() << " tried to win the fight with an ancient curse but the curse proved ineffective!" << std::endl;
         }

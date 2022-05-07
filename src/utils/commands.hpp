@@ -1,11 +1,11 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 
+#include "../shop.hpp"
 #include "command.hpp"
 #include "game.hpp"
 #include "iostream"
 #include "utils.hpp"
-#include "../shop.hpp"
 
 class EchoCommand : public Command {
 
@@ -69,7 +69,6 @@ class SkillCommand : public Command {
     explicit SkillCommand() : Command("skills") {
     }
 
-
     bool onCommand(Player *player, std::vector<std::string> &args) noexcept(true) override {
         if (args.empty()) {
             printUsages();
@@ -98,7 +97,6 @@ class SkillCommand : public Command {
 class SkipCommand : public Command {
     public:
     explicit SkipCommand() : Command("skip") {
-
     }
 
     bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
@@ -115,7 +113,6 @@ class SkipCommand : public Command {
     void printUsages() const noexcept(true) override {
         printLines({"Skip command: skip the shop"});
     }
-
 };
 
 class ShopCommand : public Command {
@@ -206,6 +203,159 @@ class ShopCommand : public Command {
                     printUsage("buy"),
                     printUsage("show"),
                     "/shop help (show this help menu)"});
+    }
+};
+
+class StatusCommand : public Command {
+
+    public:
+    explicit StatusCommand() : Command("status") {
+    }
+
+    bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
+        player->printStatus();
+        player->printMap();
+        std::cout << std::endl;
+        return true;
+    }
+};
+
+class MapCommand : public Command {
+    public:
+    MapCommand() : Command("whereami") {
+    }
+
+    bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
+        player->printMap();
+        std::cout << std::endl;
+        return true;
+    }
+};
+
+class StatsCommand : public Command {
+
+    public:
+    StatsCommand() : Command("stats") {
+    }
+
+    bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
+        player->printAHD();
+        std::cout << std::endl;
+        return true;
+    }
+};
+
+class BattleCommand : public Command {
+
+    private:
+    BattleHandler *battleHandler;
+
+    static void printBattleInfo(Battle *battle) {
+        std::cout << battle->getNumEnemies() << " remain.";
+        battle->printOpponent();
+        std::cout << std::endl;
+    }
+
+    void endBattle(Player *player) {
+        battleHandler->endBattle();
+        std::cout << player->getName() << " has defeated those foul beasts. " << std::endl;
+        std::cout << player->getName() << " trudges on to meet his next fate." << std::endl;
+        player->incrementPosition();
+        player->printMap();
+    }
+
+    bool performAttack(Player *player) {
+        Optional<Battle> optionalBattle = battleHandler->getcurrentBattle();
+        if (optionalBattle.isEmpty()) {
+            std::cout << "You can only perform an attack whilst in battle!" << std::endl;
+            return false;
+        }
+        if (player->isDead()) {
+            std::cout << "You can't attack if you're dead!" << std::endl;
+            return false;
+        }
+        Battle *battle = optionalBattle.value();
+        Optional<Entity> optionalEnemy = battle->getCurrentOpponent();
+        if (optionalEnemy.isEmpty()) {
+            optionalEnemy = battle->update();
+        }
+        if (!battle->isValid()) {
+            endBattle(player);
+            player->incrementPosition();
+            return true;
+        }
+        Entity *opponent = optionalEnemy.value();
+        opponent->takeDamage(player->getAttribute(Entity::Attribute::ATTACK));
+        if (opponent->isDead()) {
+            std::cout << player->getName() << "has killed the " << opponent->getName() << std::endl;
+        }
+        battle->update();
+        if (battle->getNumEnemies() == 0) {
+            endBattle(player);
+        } else {
+            printBattleInfo(battle);
+        }
+        return true;
+    }
+
+    public:
+    explicit BattleCommand(BattleHandler *handler) : Command("battle") {
+        battleHandler = handler;
+    }
+
+    bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
+        if (args.empty()) {
+            Optional<Battle> optional = battleHandler->getcurrentBattle();
+            if (optional.isEmpty()) {
+                std::cout << "You are not in a battle right now." << std::endl;
+            } else {
+                Battle *battle = optional.value();
+                std::cout << "You are currently engaged in a battle." << std::endl;
+                printBattleInfo(battle);
+            }
+            return true;
+        }
+        if (toLowercase(args[0]) == "attack") {
+            return performAttack(player);
+        }
+        std::cout << "Unknown subcommand: " + args[0] << std::endl;
+        return false;
+    }
+};
+
+class CardsCommand : public Command {
+
+    GameClient* client;
+
+    public:
+    explicit CardsCommand(GameClient *_client) : Command("cards") {
+        client = _client;
+    }
+
+    bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
+        if (args.empty()) {
+            std::cout << "You currently have " << player->getInventorySize() << " cards in your inventory.";
+            return true;
+        }
+        if (toLowercase(args[0]) == "use") {
+            if (args.size() < 2) {
+                return false;
+            }
+            Optional<int> index = fromString(args[1]);
+            if (index.isEmpty()) {
+                std::cout << "Invalid index: " << args[1] << std::endl;
+                return false;
+            }
+            Registry<int, CardTemplate*> *registry = client->getCardTemplates();
+            int cardIndex = *index.value();
+            Card *card = player->getCard(cardIndex);
+            CardTemplate* cardTemplate = *registry->get(cardIndex).value();
+            if (cardTemplate->onCardUse(player, card)) {
+                player->removeCardFromInventory(card);
+            }
+            return true;
+        }
+        return false;
     }
 
 };

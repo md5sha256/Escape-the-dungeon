@@ -52,12 +52,18 @@ class SimpleGameClient : public GameClient {
         Command *exitCommand = new ExitCommand(this);
         Command *skillsCommand = new SkillCommand;
         Command *skipCommand = new SkipCommand;
-        Command *shopComamnd = new ShopCommand(this);
-        commandExecutor->registerCommand(echoCommand);
-        commandExecutor->registerCommand(exitCommand);
-        commandExecutor->registerCommand(skillsCommand);
-        commandExecutor->registerCommand(skipCommand);
-        commandExecutor->registerCommand(shopComamnd);
+        Command *shopCommand = new ShopCommand(this);
+        Command *statusCommand = new StatusCommand;
+        Command *mapCommand = new MapCommand;
+        Command *statsCommand = new StatsCommand;
+        Command *battleCommand = new BattleCommand(battleHandler);
+        Command *cardCommand = new CardsCommand(this);
+        commandExecutor->registerCommands({
+            echoCommand, exitCommand, skillsCommand,
+            skipCommand, shopCommand, statusCommand,
+            mapCommand, statsCommand, battleCommand,
+            cardCommand
+        });
     }
 
     void registerTemplates() noexcept(false) {
@@ -100,8 +106,7 @@ class SimpleGameClient : public GameClient {
         if (player->getPosition() < 10) {
             switch (player->getPathAtPosition()) {
                 case BATTLE_PATH: {
-                    std::cout << "battle placeholder" << std::endl;
-                    player->incrementPosition();
+                    startBattle(player, battleHandler);
                     break;
                 }
                 case CAMPFIRE_PATH: {
