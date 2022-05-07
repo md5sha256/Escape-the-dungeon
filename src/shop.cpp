@@ -90,6 +90,7 @@ class SimpleShop : public Shop {
     void printItem(GameClient *client, Player *player, const int &index) override {
         if (index < 0 || index > getSize() - 1) {
             throw std::invalid_argument("Invalid index: " + std::to_string(index));
+            return;
         }
         ShopItem item = items[index];
         Card* card = item.getCard();
