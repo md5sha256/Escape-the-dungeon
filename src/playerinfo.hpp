@@ -4,6 +4,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 #include <map>
 #include "utils/optional.hpp"
@@ -139,6 +140,7 @@ struct Entity {
 
     public:
     explicit Entity(const std::string &_name) {
+        std::cout << _name << " was created!" << std::endl;
         name = _name;
     }
 
@@ -148,7 +150,7 @@ struct Entity {
         }
     }
 
-    std::string getName() noexcept {
+    [[nodiscard]] std::string getName() const noexcept {
         return name;
     }
 
@@ -210,7 +212,7 @@ struct Entity {
             actual = -modifyAttribute(HEALTH, -healthDmg);
         }
         // We only print damage done to health and not defence
-        printf("%s %s %d %s", getName().data(), "suffered", -actual, "health damage");
+        printf("%s %s %d %s\n", getName().data(), "suffered", -actual, "health damage");
     }
 
 };

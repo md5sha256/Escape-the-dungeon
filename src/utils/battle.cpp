@@ -34,7 +34,7 @@ Entity* generateRandomEnemy() {
     else//if somewhere balance
         name += "Shrem";
     std::map<Attribute, int> attrs = {{Attribute::HEALTH, hp}, {Attribute::ATTACK, attack}, {Attribute ::DEFENCE, defence}};
-    return new Entity{name, attrs};
+    return new Entity(name, attrs);
 }
 
 bool startBattle(Player *player, BattleHandler *handler) {

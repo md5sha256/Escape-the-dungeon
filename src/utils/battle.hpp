@@ -6,16 +6,19 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include "list"
 
 struct Battle {
 
     Player *player;
-    std::vector<Entity*> enemies;
+    std::list<Entity*> enemies;
 
     public:
     Battle(Player *_player, const std::vector<Entity*> &opponents) {
         player = _player;
-        enemies = opponents;
+        for (const auto &enemy : opponents) {
+            enemies.push_back(enemy);
+        }
     }
 
     ~Battle() {
@@ -31,39 +34,34 @@ struct Battle {
     }
 
     [[nodiscard]] std::vector<Entity*> getEnemies() const {
-        return enemies;
+        return std::vector<Entity*>{enemies.begin(), enemies.end()};
     }
 
     [[nodiscard]] int getNumEnemies() const {
-        return enemies.size();
+        return (int) enemies.size();
     }
 
     [[nodiscard]] Optional<Entity> getCurrentOpponent() const {
         if (enemies.empty()) {
             return nullopt<Entity>();
         }
-        return Optional<Entity>{enemies[0]};
+        return Optional<Entity>{enemies.front()};
     }
 
-    Optional<Entity> update() {
+    Battle* update() noexcept(true) {
         Optional<Entity> current = getCurrentOpponent();
         if (current.isPresent()) {
             Entity *enemy = current.value();
             if (enemy->isDead()) {
-                enemies.erase(enemies.begin());
+                enemies.pop_front();
             }
             // Free up the enemy as they are no longer needed
             delete enemy;
         }
-        return getCurrentOpponent();
+        return this;
     }
 
-    void printOpponent() {
-        Optional<Entity> optional = getCurrentOpponent();
-        if (optional.isEmpty()) {
-            return;
-        }
-        Entity* entity = optional.value();
+    void printOpponent(Entity *entity) const {
         std::cout << "A " << entity->getName() << " steps up to challenge " << player->getName() << std::endl;
         std::cout << entity->getName() << "'s stats:" << std::endl;
         entity->printAttribute(Entity::Attribute::HEALTH);

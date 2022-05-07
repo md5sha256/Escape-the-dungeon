@@ -251,8 +251,18 @@ class BattleCommand : public Command {
     BattleHandler *battleHandler;
 
     static void printBattleInfo(Battle *battle) {
-        std::cout << battle->getNumEnemies() << " remain.";
-        battle->printOpponent();
+        int num = battle->getNumEnemies();
+        if (num == 0) {
+            std::cout << "No enemies remain." << std::endl;
+        } else if (num == 1) {
+            std::cout << num << " enemy remains." << std::endl;
+        } else {
+            std::cout << num << " enemies remain." << std::endl;
+        }
+        Optional<Entity> opponent = battle->getCurrentOpponent();
+        if (opponent.isPresent()) {
+            battle->printOpponent(opponent.value());
+        }
         std::cout << std::endl;
     }
 
@@ -277,17 +287,16 @@ class BattleCommand : public Command {
         Battle *battle = optionalBattle.value();
         Optional<Entity> optionalEnemy = battle->getCurrentOpponent();
         if (optionalEnemy.isEmpty()) {
-            optionalEnemy = battle->update();
+            optionalEnemy = battle->update()->getCurrentOpponent();
         }
-        if (!battle->isValid()) {
+        if (optionalEnemy.isEmpty()) {
             endBattle(player);
-            player->incrementPosition();
             return true;
         }
         Entity *opponent = optionalEnemy.value();
         opponent->takeDamage(player->getAttribute(Entity::Attribute::ATTACK));
         if (opponent->isDead()) {
-            std::cout << player->getName() << "has killed the " << opponent->getName() << std::endl;
+            std::cout << player->getName() << " has killed the " << opponent->getName() << std::endl;
         }
         battle->update();
         if (battle->getNumEnemies() == 0) {
@@ -321,6 +330,12 @@ class BattleCommand : public Command {
         std::cout << "Unknown subcommand: " + args[0] << std::endl;
         return false;
     }
+
+
+    void printUsages() const noexcept(true) override {
+        std::cout << "Battle command: check if you are in a battle and attack" << std::endl << std::endl;
+    }
+
 };
 
 class CardsCommand : public Command {
