@@ -231,9 +231,7 @@ class JsonDatabase : public Database {
         }
         auto attributes = document.FindMember(ATTRIBUTES);
         if (attributes != document.MemberEnd()) {
-            std::cout << "Loading attributes" << std::endl;
             auto attrs = deserializeAttributes(attributes->value);
-            std::cout << "Size: " << attrs.size() << std::endl;
             player->setAttributes(attrs);
         }
         auto inventory = document.FindMember(INVENTORY);

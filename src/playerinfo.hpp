@@ -142,7 +142,9 @@ struct Entity {
     }
 
     Entity(const std::string &_name, const std::map<Attribute, int> &attrs) : Entity(_name){
-        printAHD();
+        for (const auto &pair : attrs) {
+            attributes[pair.first] = pair.second;
+        }
     }
 
     [[nodiscard]] std::string getName() const noexcept {

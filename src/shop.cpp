@@ -34,11 +34,9 @@ class SimpleShop : public Shop {
             int index = random % size;
             templateId = rare[index];
             price = priceRare;
-        } else if (random >= chanceCommon) {
+        } else {
             templateId = common[0];
             price = priceCommon;
-        } else {
-            throw std::invalid_argument("Improper card setup detected!");
         }
         Card *item = client->getDatabase()->createCard(templateId);
         return ShopItem{item, price};
@@ -53,7 +51,7 @@ class SimpleShop : public Shop {
         items.clear();
         items.reserve(getSize());
         for (int i = 0; i < getOriginalSize(); i++) {
-            items[i] = generateShopItem(client);
+            items.push_back(generateShopItem(client));
         }
     }
 
