@@ -1,11 +1,11 @@
-#ifndef CARDTEMPLATES_HPP
-#define CARDTEMPLATES_HPP
+#ifndef CARDTEMPLATES_H
+#define CARDTEMPLATES_H
 
 #include "../playerinfo.h"
 #include "card.h"
 #include "game.h"
 #include "optional.h"
-#include "utils.hpp"
+#include "utils.h"
 
 const int SKILL_POINT_CARD = 0;
 const int DAMAGE_CARD = 1;
@@ -273,4 +273,4 @@ class ReviveCardTemplate : public CardTemplate {
     }
 };
 
-#endif//CARDTEMPLATES_HPP
+#endif//CARDTEMPLATES_H

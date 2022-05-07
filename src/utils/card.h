@@ -1,9 +1,5 @@
-//
-// Created by Andy on 5/5/2022.
-//
-
-#ifndef CARD_HPP
-#define CARD_HPP
+#ifndef CARD_H
+#define CARD_H
 
 #include "../playerinfo.h"
 
@@ -40,4 +36,4 @@ class CardTemplate {
     }
 };
 
-#endif//CARD_HPP
+#endif//CARD_H

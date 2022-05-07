@@ -1,5 +1,5 @@
-#ifndef DEMO_HPP
-#define DEMO_HPP
+#ifndef DEMO_H
+#define DEMO_H
 
 #ifdef WINDOWS
 #include <direct.h>
@@ -20,4 +20,4 @@ std::string getWorkDir() {
     return current_working_dir;
 }
 
-#endif//DEMO_HPP
+#endif//DEMO_H

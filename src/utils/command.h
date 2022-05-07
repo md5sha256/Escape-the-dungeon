@@ -1,5 +1,5 @@
-#ifndef COMMAND_HPP
-#define COMMAND_HPP
+#ifndef COMMAND_H
+#define COMMAND_H
 
 #include "../playerinfo.h"
 #include <sstream>
@@ -94,4 +94,4 @@ class Command {
     }
 };
 
-#endif//COMMAND_HPP
+#endif//COMMAND_H

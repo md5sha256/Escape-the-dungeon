@@ -1,5 +1,10 @@
 #include "registry.h"
 
+/**
+ * Implementation of a Registry
+ * @tparam K The type of keys
+ * @tparam V The type of values
+ */
 template<typename K, typename V>
 class SimpleRegistry : public Registry<K, V> {
 
@@ -36,6 +41,7 @@ class SimpleRegistry : public Registry<K, V> {
     Optional<V> get(const K &key) override {
         auto iter = data.find(key);
         if (iter == data.end()) {
+            // Key doesn't exist so we return an empty optional
             return nullopt<V>();
         }
         return Optional<V>(&iter->second);

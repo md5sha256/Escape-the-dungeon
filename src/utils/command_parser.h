@@ -1,5 +1,5 @@
-#ifndef COMMAND_PARSER_HPP
-#define COMMAND_PARSER_HPP
+#ifndef COMMAND_PARSER_H
+#define COMMAND_PARSER_H
 
 #include "command.h"
 #include "iostream"
@@ -21,4 +21,4 @@ class CommandParser {
 
 CommandParser* newCmdParser();
 
-#endif//COMMAND_PARSER_HPP
+#endif//COMMAND_PARSER_H

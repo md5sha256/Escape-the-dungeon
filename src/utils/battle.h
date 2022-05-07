@@ -1,5 +1,5 @@
-#ifndef BATTLE_HPP
-#define BATTLE_HPP
+#ifndef BATTLE_H
+#define BATTLE_H
 
 #include "../playerinfo.h"
 #include "list"
@@ -101,4 +101,4 @@ std::vector<Entity*> generateEnemies();
 
 bool startBattle(Player *player, BattleHandler *battleHandler);
 
-#endif//BATTLE_HPP
+#endif//BATTLE_H

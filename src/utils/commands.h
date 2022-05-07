@@ -1,12 +1,12 @@
-#ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+#ifndef COMMANDS_H
+#define COMMANDS_H
 
 #include "../shop.h"
 #include "command.h"
 #include "command_executor.h"
 #include "game.h"
 #include "iostream"
-#include "utils.hpp"
+#include "utils.h"
 
 class ExitCommand : public Command {
 
@@ -260,7 +260,7 @@ class StatsCommand : public Command {
     }
 
     bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
-        player->printAHD();
+        player->printAttributes();
         std::cout << std::endl;
         return true;
     }
@@ -443,4 +443,4 @@ class HelpCommand : public Command {
 
 };
 
-#endif//COMMANDS_HPP
+#endif//COMMANDS_H

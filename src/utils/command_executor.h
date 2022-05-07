@@ -1,5 +1,5 @@
-#ifndef COMMAND_EXECUTOR_HPP
-#define COMMAND_EXECUTOR_HPP
+#ifndef COMMAND_EXECUTOR_H
+#define COMMAND_EXECUTOR_H
 
 #include "../playerinfo.h"
 #include "command.h"
@@ -28,4 +28,4 @@ class CommandExecutor {
 
 CommandExecutor* newCmdExecutor();
 
-#endif//COMMAND_EXECUTOR_HPP
+#endif//COMMAND_EXECUTOR_H

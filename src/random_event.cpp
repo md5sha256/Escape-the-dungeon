@@ -12,19 +12,21 @@ void event1(Player *p) {
 
     while (true) {
         std::cin >> input;
-        if (input == "1") {               //if player choose to go into the pond
-            int damage = (rand() % 5) + 1;//deal 1-5 damage to player
+        //if player choose to go into the pond
+        if (input == "1") {
+            //deal 1-5 damage to player
+            int damage = (rand() % 5) + 1;
             p->takeDamage(damage);
             if (p->isDead()) {
                 std::cout << p->getName() << " endures the severe pain brought by strong acid, picked up the jewelry in the pond, but never got the chance to go back to the shore again" << std::endl;
             } else {
                 int gold = (rand() % 70 + 30);
                 std::cout << p->getName() << " brought back " << gold << " gold from the pond, but suffered " << damage << " damage" << std::endl;
-                p->modifyGold(gold);//give reward
+                //give reward
+                p->modifyGold(gold);
             }
             break;
         } else if (input == "2") {
-            p->incrementPosition();//move to the next
             break;
         } else
             std::cout << "Input a valid number!" << std::endl;
@@ -39,8 +41,15 @@ void event2(Player *p) {
 
     while (true) {
         std::cin >> input;
-        if (input == "1") {         //if player choose spend gold
-            int luck = (rand() % 2);//50/50 chance of getting reward
+        //if player choose spend gold
+        if (input == "1") {
+            if (p->getGold() < 10) {
+                std::cout << "You don't have enough gold!" << std::endl;
+                return;
+            }
+            p->modifyGold(-10);
+            int luck = (rand() % 2);
+            //50/50 chance of getting reward
             if (luck == 1) {
                 std::cout << p->getName() << " feels power filling the body" << std::endl;
                 int value = (rand() % 3) + 1;
@@ -60,6 +69,7 @@ void event2(Player *p) {
                         toModify = DEFENCE;
                         break;
                     default:
+                        // Should never be thrown as the random number is bounded 0..2
                         throw std::invalid_argument("Invalid type: " + std::to_string(type));
                 }
                 p->modifyAttribute(toModify, value);
@@ -68,8 +78,7 @@ void event2(Player *p) {
             }
             break;
         } else if (input == "2") {
-            // Move to the next position
-            p->incrementPosition();
+            // player chose to leave
             break;
         } else {
             std::cout << "Input a valid number!" << std::endl;
@@ -102,8 +111,6 @@ void event3(Player *p) {
             break;
         } else if (input == "2") {
             std::cout << p->getName() << " decided not to take the statue." << std::endl;
-            // move to the next position
-            p->incrementPosition();
             break;
         } else
             std::cout << "Input a valid number!" << std::endl;
@@ -138,6 +145,16 @@ void event4(Player *p) {
     }
 }
 
+/**
+ * Prompt a random event to occur
+ * This function will perform some interactions
+ * with the player through std::cin but will
+ * not change the player's position unless it is
+ * through teleportation. The caller should
+ * manually increment the player's position after
+ * the function has returned.
+ * @param p The player to spawn the random event against
+ */
 void randomEvent(Player *p) {
     srand(time(nullptr));
     int choice = rand() % 4;
@@ -154,6 +171,7 @@ void randomEvent(Player *p) {
         case 3:
             event4(p);
         default:
+            // Should never happen as the random number is bounded between 0..3
             throw std::invalid_argument("unexpected random choice: " + std::to_string(choice));
     }
 }

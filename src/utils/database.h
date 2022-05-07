@@ -1,5 +1,5 @@
-#ifndef DATABASE_HPP
-#define DATABASE_HPP
+#ifndef DATABASE_H
+#define DATABASE_H
 
 #include "../playerinfo.h"
 #include "card.h"
@@ -24,7 +24,7 @@ class Database {
     }
 
     public:
-    ~Database() {
+    virtual ~Database() {
         for (auto ptr : *cardDeck) {
             delete ptr;
         }
@@ -55,4 +55,4 @@ class Database {
 
 Database *newDatabase(const std::string &path) noexcept(true);
 
-#endif//DATABASE_HPP
+#endif//DATABASE_H
