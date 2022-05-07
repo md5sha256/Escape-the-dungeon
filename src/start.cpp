@@ -19,43 +19,43 @@ Player* initPlayer() {
     g.generate();
     std::cout << "Please select your path to the entrance." << std::endl;
     std::cout << "Path 1:" << std::endl;
-    for (int i = 0; i < 10; i++) {
-        if (g.path1[i] == 0)
+    for (int path : g.path1) {
+        if (path == BATTLE_PATH)
             std::cout << "Battle >> ";
-        if (g.path1[i] == 1)
+        if (path == CAMPFIRE_PATH)
             std::cout << "Campfire >> ";
-        if (g.path1[i] == 2)
+        if (path == SHOP_PATH)
             std::cout << "Shop >> ";
-        if (g.path1[i] == 3)
+        if (path == EVENT_PATH)
             std::cout << "Event >> ";
-        if (g.path1[i] == 4)
-            std::cout << "Boss >> Escape" << std::endl;
+        if (path == WIN_PATH)
+            std::cout << "Escape" << std::endl;
     }
     std::cout << "Path 2:" << std::endl;
-    for (int i = 0; i < 10; i++) {
-        if (g.path2[i] == 0)
+    for (int path : g.path2) {
+        if (path == BATTLE_PATH)
             std::cout << "Battle >> ";
-        if (g.path2[i] == 1)
+        if (path == CAMPFIRE_PATH)
             std::cout << "Campfire >> ";
-        if (g.path2[i] == 2)
+        if (path == SHOP_PATH)
             std::cout << "Shop >> ";
-        if (g.path2[i] == 3)
+        if (path == EVENT_PATH)
             std::cout << "Event >> ";
-        if (g.path2[i] == 4)
-            std::cout << "Boss >> Escape" << std::endl;
+        if (path == WIN_PATH)
+            std::cout << "Escape" << std::endl;
     }
     std::cout << "Path 3:" << std::endl;
-    for (int i = 0; i < 10; i++) {
-        if (g.path3[i] == 0)
+    for (int path : g.path3) {
+        if (path == BATTLE_PATH)
             std::cout << "Battle >> ";
-        if (g.path3[i] == 1)
+        if (path == CAMPFIRE_PATH)
             std::cout << "Campfire >> ";
-        if (g.path3[i] == 2)
+        if (path == SHOP_PATH)
             std::cout << "Shop >> ";
-        if (g.path3[i] == 3)
+        if (path == EVENT_PATH)
             std::cout << "Event >> ";
-        if (g.path3[i] == 4)
-            std::cout << "Boss >> Escape" << std::endl;
+        if (path == WIN_PATH)
+            std::cout << "Escape" << std::endl;
     }
     std::cout << "Enter a path number: ";
     std::vector<int> playerPath;

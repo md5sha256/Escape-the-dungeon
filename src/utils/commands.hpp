@@ -379,24 +379,38 @@ class CardsCommand : public Command {
 
     bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
         if (args.empty()) {
-            std::cout << "You currently have " << player->getInventorySize() << " cards in your inventory.";
+            std::cout << "You currently have " << player->getInventorySize() << " cards in your inventory." << std::endl;
             return true;
         }
+        Registry<int, CardTemplate*> *registry = client->getCardTemplates();
         if (toLowercase(args[0]) == "use") {
             if (args.size() < 2) {
                 return false;
             }
             Optional<int> index = fromString(args[1]);
-            if (index.isEmpty() || player->getInventorySize()==0) {
+            if (index.isEmpty()) {
                 std::cout << "Invalid index: " << args[1] << std::endl;
                 return false;
             }
-            Registry<int, CardTemplate*> *registry = client->getCardTemplates();
-            int cardIndex = *index.value();
+            if (player->getInventorySize() == 0) {
+                std::cout << "You don't have any cards!" << std::endl;
+                return true;
+            }
+            int cardIndex = (*index.value()) - 1;
             Card *card = player->getCard(cardIndex);
-            CardTemplate* cardTemplate = *registry->get(cardIndex).value();
+            CardTemplate* cardTemplate = *registry->get(card->getTemplateId()).value();
             if (cardTemplate->onCardUse(player, card)) {
                 player->removeCardFromInventory(card);
+            }
+            return true;
+        }
+        if (toLowercase(args[0]) == "show") {
+            int i(1);
+            for (const auto &card : player->getInventory()) {
+                std::cout << "Card number: " << (i++) << std::endl;
+                CardTemplate* cardTemplate = *registry->get(card->getTemplateId()).value();
+                cardTemplate->displayCard(card);
+                std::cout << std::endl;
             }
             return true;
         }

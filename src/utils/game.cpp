@@ -216,7 +216,7 @@ class SimpleGameClient : public GameClient {
         player = initPlayer();
         database->reset();
         saveData();
-        checkPosition();
+        player->printStatus();
     }
 
 };

@@ -61,7 +61,7 @@ class SimpleShop : public Shop {
             player->addCardToInventory(item->getCard());
             player->modifyGold(-item->getGoldCost());
             std::cout << "\"Yes! it would definitely help your journey in the dungeon!\"" << std::endl
-                      << "You have " << player->getGold() << " left." << std::endl;
+                      << "You have " << player->getGold() << " gold left." << std::endl;
             removeItem(index);
         } else {
             std::cout << "\"Doesn't look like your wallet is ready for this..\"" << std::endl;

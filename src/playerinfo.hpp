@@ -306,9 +306,7 @@ struct Player : public Entity {
                     std::cout << "Shop >> ";
                 else if (path[i] == 3)
                     std::cout << "Event >> ";
-                else
-                    std::cout << "Boss>>";
-            } else {//highlight the current postion of player on map
+            } else {//highlight the current position of player on map
                 if (path[i] == 0)
                     std::cout << "**Battle** >> ";
                 else if (path[i] == 1)
@@ -317,8 +315,6 @@ struct Player : public Entity {
                     std::cout << "**Shop** >> ";
                 else if (path[i] == 3)
                     std::cout << "**Event** >> ";
-                else
-                    std::cout << "**Boss** >> ";
             }
         }
         std::cout << "Escape" << std::endl;//print the final station on the map
@@ -374,8 +370,9 @@ struct Path {
             } else
                 path2.push_back(0);
         }
-        srand(time(NULL) + 3);//generate the third path
+        //generate the third path
         //player should encounter battle at the beginning of each path, for earning enough money to buy stuff in shop
+        path3.push_back(0);
         for (int i = 0; i < 8; i++) {
             int j = rand() % 5;
             if (j == 4) {//limit the appearance of shop,campfire and random event to 1/5 probability
@@ -384,6 +381,9 @@ struct Path {
             } else
                 path3.push_back(0);
         }
+        path1.push_back(WIN_PATH);
+        path2.push_back(WIN_PATH);
+        path3.push_back(WIN_PATH);
     }
 };
 

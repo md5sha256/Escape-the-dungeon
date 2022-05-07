@@ -236,7 +236,7 @@ class JsonDatabase : public Database {
 
         databaseFile.open(path + PLAYER_DATA, std::ios::out | std::ios::trunc);
         rapidjson::OStreamWrapper databaseWrapper(databaseFile);
-        rapidjson::PrettyWriter<rapidjson::OStreamWrapper> writer(databaseWrapper);
+        rapidjson::PrettyWriter<rapidjson::OStreamWrapper, rapidjson::Document::EncodingType, rapidjson::UTF8<>> writer(databaseWrapper);
         writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatSingleLineArray);
         data.Accept(writer);
         databaseFile.close();
