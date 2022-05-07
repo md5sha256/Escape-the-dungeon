@@ -52,6 +52,7 @@ class SimpleExecutor : public CommandExecutor {
     bool executeCommand(Player *player, const CommandData &data) noexcept(false) override {
         Optional<Command> optionalCmd = findCommand(data.getCommandName());
         if (optionalCmd.isEmpty()) {
+            std::cout << "Unknown command: " << data.getCommandName() << std::endl;
             return false;
         }
         Command *command = optionalCmd.value();

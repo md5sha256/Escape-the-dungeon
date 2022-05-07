@@ -58,12 +58,14 @@ class SimpleGameClient : public GameClient {
         Command *statsCommand = new StatsCommand;
         Command *battleCommand = new BattleCommand(battleHandler);
         Command *cardCommand = new CardsCommand(this);
+        Command *helpCommand = new HelpCommand(commandExecutor);
         commandExecutor->registerCommands({
             restartCommand, exitCommand, skillsCommand,
             skipCommand, shopCommand, statusCommand,
             mapCommand, statsCommand, battleCommand,
-            cardCommand
+            cardCommand, helpCommand
         });
+
     }
 
     void registerTemplates() noexcept(false) {

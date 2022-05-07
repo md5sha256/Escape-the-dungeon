@@ -6,6 +6,7 @@
 #include "game.hpp"
 #include "iostream"
 #include "utils.hpp"
+#include "command_executor.hpp"
 
 class ExitCommand : public Command {
 
@@ -415,6 +416,29 @@ class CardsCommand : public Command {
             return true;
         }
         return false;
+    }
+
+};
+
+class HelpCommand : public Command {
+
+    CommandExecutor *executor;
+
+    public:
+    explicit HelpCommand(CommandExecutor *_exec) : Command("help") {
+        executor = _exec;
+    }
+
+    bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
+        std::vector<Command*> commands = executor->getRegisteredCommands();
+        std::vector<std::string> names(commands.size());
+        for (const auto &cmd : commands) {
+            names.push_back("- /" + cmd->getName());
+        }
+        std::sort(names.begin(), names.end());
+        std::cout << "Available commands: " << std::endl;
+        printLines(names);
+        return true;
     }
 
 };
