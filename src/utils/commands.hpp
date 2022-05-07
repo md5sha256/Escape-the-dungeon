@@ -342,7 +342,7 @@ class CardsCommand : public Command {
                 return false;
             }
             Optional<int> index = fromString(args[1]);
-            if (index.isEmpty()) {
+            if (index.isEmpty() || player->getInventorySize()==0) {
                 std::cout << "Invalid index: " << args[1] << std::endl;
                 return false;
             }
