@@ -1,4 +1,4 @@
-#include "battle.hpp"
+#include "battle.h"
 
 std::vector<Entity*> generateEnemies() {
     srand(time(nullptr));

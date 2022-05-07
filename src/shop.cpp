@@ -1,8 +1,8 @@
-#include "shop.hpp"
+#include "shop.h"
+#include "utils/cardtemplates.h"
+#include "utils/game.h"
 #include <iostream>
 #include <string>
-#include "utils/game.hpp"
-#include "utils/cardtemplates.hpp"
 
 class SimpleShop : public Shop {
 

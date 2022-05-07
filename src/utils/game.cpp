@@ -1,10 +1,10 @@
-#include "game.hpp"
+#include "game.h"
 
-#include "cardtemplates.hpp"
-#include "command_executor.hpp"
-#include "command_parser.hpp"
-#include "commands.hpp"
-#include "database.hpp"
+#include "cardtemplates.h"
+#include "command_executor.h"
+#include "command_parser.h"
+#include "commands.h"
+#include "database.h"
 
 class SimpleGameClient : public GameClient {
 

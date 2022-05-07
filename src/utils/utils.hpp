@@ -1,7 +1,7 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-#include "optional.hpp"
+#include "optional.h"
 #include "random"
 #include "sstream"
 #include "string"

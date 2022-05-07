@@ -1,5 +1,5 @@
-#include "demo.hpp"
-#include "utils/game.hpp"
+#include "demo.h"
+#include "utils/game.h"
 
 int main() {
     GameClient* client = newGameClient(getWorkDir() + "/");

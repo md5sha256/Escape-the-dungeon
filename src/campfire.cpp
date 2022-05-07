@@ -1,4 +1,6 @@
-#include "campfire.hpp"
+#include "playerinfo.h"
+#include<iostream>
+#include<string>
 
 void campfire(Player *p) {
     std::string input;

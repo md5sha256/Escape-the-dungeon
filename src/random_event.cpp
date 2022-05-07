@@ -1,4 +1,4 @@
-#include "playerinfo.hpp"
+#include "playerinfo.h"
 #include <cstdlib>
 #include <ctime>
 #include <iostream>

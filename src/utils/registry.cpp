@@ -1,4 +1,4 @@
-#include "registry.hpp"
+#include "registry.h"
 
 template<typename K, typename V>
 class SimpleRegistry : public Registry<K, V> {

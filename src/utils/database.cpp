@@ -1,8 +1,8 @@
-#include "database.hpp"
+#include "database.h"
 #include <sstream>
 
 #include "../../include/rapidjson/document.h"
-#include "optional.hpp"
+#include "optional.h"
 
 #include "../../include/rapidjson/istreamwrapper.h"
 #include "../../include/rapidjson/ostreamwrapper.h"
