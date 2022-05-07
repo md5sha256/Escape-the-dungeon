@@ -12,7 +12,7 @@ class CardTemplate {
     int id;
 
     protected:
-    explicit CardTemplate(int cardId) {
+    explicit CardTemplate(const int &cardId) {
         id = cardId;
     }
 
@@ -27,13 +27,9 @@ class CardTemplate {
         return true;
     }
 
-    virtual void displayCard(Card *card) {
+    virtual void displayCard(Card *card) = 0;
 
-    }
-
-    virtual void initCard(Card *card) {
-
-    }
+    virtual void initCard(Card *card) = 0;
 
     static bool checkDead(Player *player) {
         if (player->isDead()) {

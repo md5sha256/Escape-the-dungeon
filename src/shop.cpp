@@ -6,40 +6,38 @@
 
 class SimpleShop : public Shop {
 
-    static ShopItem generateShopItem(GameClient *client) {
+    static ShopItem* generateShopItem(GameClient *client) {
         // LEGENDARY CARDS
-        int chanceLegendary = 100 - 10;
+        int chanceLegendary = 90;
         int priceLegendary = 200;
-        int legendary[] = {REVIVE_CARD, WIN_BATTLE_CARD};
+        std::vector<int> legendary = {REVIVE_CARD, WIN_BATTLE_CARD};
         // RARE CARDS
-        int chanceRare = 100 - 30;
+        int chanceRare = 70;
         int priceRare = 40;
-        int rare[] = {TELEPORT_CARD, SKILL_POINT_CARD};
+        std::vector<int> rare = {TELEPORT_CARD, SKILL_POINT_CARD};
 
         // COMMON CARDS
-        int chanceCommon = 100 - 60;
         int priceCommon = 10;
-        int common[] = {DAMAGE_CARD};
+        std::vector<int> common = {DAMAGE_CARD};
 
-        int random = rand() % 101;
+        int random = randIntPercent();
         int templateId;
         int price;
+        std::cout << random << std::endl;
         if (random >= chanceLegendary) {
-            int size = sizeof legendary;
-            int index = random % size;
-            templateId = legendary[index];
+            templateId = randomElement(legendary);
             price = priceLegendary;
         } else if (random >= chanceRare) {
-            int size = sizeof rare;
-            int index = random % size;
-            templateId = rare[index];
+            templateId = randomElement(rare);
             price = priceRare;
         } else {
             templateId = common[0];
             price = priceCommon;
         }
         Card *item = client->getDatabase()->createCard(templateId);
-        return ShopItem{item, price};
+        CardTemplate* cardTemplate = *client->getCardTemplates()->get(templateId).value();
+        cardTemplate->initCard(item);
+        return new ShopItem{item, price};
     }
 
     public:
@@ -59,10 +57,10 @@ class SimpleShop : public Shop {
         if (index < 0 || index > getSize() - 1) {
             throw std::invalid_argument("Invalid item index: " + std::to_string(index));
         }
-        ShopItem item = items[index];
-        if (player->getGold() >= item.getGoldCost()) {
-            player->addCardToInventory(item.getCard());
-            player->modifyGold(-item.getGoldCost());
+        ShopItem *item = items[index];
+        if (player->getGold() >= item->getGoldCost()) {
+            player->addCardToInventory(item->getCard());
+            player->modifyGold(-item->getGoldCost());
             std::cout << "\"Yes! it would definitely help your journey in the dungeon!\"" << std::endl
                       << "You have " << player->getGold() << " left." << std::endl;
             removeItem(index);
@@ -92,17 +90,17 @@ class SimpleShop : public Shop {
             throw std::invalid_argument("Invalid index: " + std::to_string(index));
             return;
         }
-        ShopItem item = items[index];
-        Card* card = item.getCard();
+        ShopItem *item = items[index];
+        Card* card = item->getCard();
         Optional<CardTemplate*> optionalTemplate = client->getCardTemplates()->get(card->getTemplateId());
         if (optionalTemplate.isEmpty()) {
             throw std::logic_error("Invalid card template: " + std::to_string(card->getTemplateId()));
         }
         std::cout << std::endl;
-        printf("%s %d", "Item", index);
+        printf("%s %d\n", "Item", index + 1);
         CardTemplate* cardTemplate = *optionalTemplate.value();
         cardTemplate->displayCard(card);
-        printf("%s: %d\n", "Cost", item.getGoldCost());
+        printf("%s: %d\n", "Cost", item->getGoldCost());
     }
 
 };

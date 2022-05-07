@@ -15,8 +15,6 @@ class JsonDatabase : public Database {
     const char *TEMPLATE_ID = "templateId";
     const char *CARD_ID = "id";
     const char *INT_ATTRIBUTES = "int-attributes";
-    const char *DOUBLE_ATTRIBUTES = "double-attributes";
-    const char *STRING_ATTRIBUTES = "string-attributes";
     const char *NAME = "name";
     const char *ATTRIBUTES = "attributes";
     const char *SKILL_POINTS = "skill-points";
@@ -45,20 +43,8 @@ class JsonDatabase : public Database {
         rapidjson::Value cardId(card->getId());
         rapidjson::Value intAttributes;
         intAttributes.SetObject();
-        rapidjson::Value doubleAttributes;
-        doubleAttributes.SetObject();
-        rapidjson::Value stringAttributes;
-        stringAttributes.SetObject();
         for (auto &pair : card->getIntAttributes()) {
             rapidjson::Value value(pair.second);
-            intAttributes.AddMember(rapidjson::StringRef(pair.first.c_str()), value, alloc);
-        }
-        for (auto &pair : card->getDoubleAttributes()) {
-            rapidjson::Value value(pair.second);
-            intAttributes.AddMember(rapidjson::StringRef(pair.first.c_str()), value, alloc);
-        }
-        for (auto &pair : card->getStringAttributes()) {
-            rapidjson::Value value(rapidjson::StringRef(pair.second.data()), alloc);
             intAttributes.AddMember(rapidjson::StringRef(pair.first.c_str()), value, alloc);
         }
         rapidjson::Value member;
@@ -66,8 +52,6 @@ class JsonDatabase : public Database {
         member.AddMember(rapidjson::StringRef(TEMPLATE_ID), templateId, alloc);
         member.AddMember(rapidjson::StringRef(CARD_ID), cardId, alloc);
         member.AddMember(rapidjson::StringRef(INT_ATTRIBUTES), intAttributes, alloc);
-        member.AddMember(rapidjson::StringRef(DOUBLE_ATTRIBUTES), doubleAttributes, alloc);
-        member.AddMember(rapidjson::StringRef(STRING_ATTRIBUTES), stringAttributes, alloc);
         return member;
     }
 
@@ -83,12 +67,10 @@ class JsonDatabase : public Database {
         document.AddMember(rapidjson::StringRef(key), value, document.GetAllocator());
     }
 
-    Card deserialize_card(rapidjson::Value &value) {
+    Card* deserialize_card(rapidjson::Value &value) {
         int templateId = value.FindMember(TEMPLATE_ID)->value.GetInt();
         int cardId = value.FindMember(CARD_ID)->value.GetInt();
         std::map<const std::string, int> intAttributes;
-        std::map<const std::string, double> doubleAttributes;
-        std::map<const std::string, std::string> stringAttributes;
         auto ints = value.FindMember(INT_ATTRIBUTES);
         if (ints != value.MemberEnd()) {
             auto intValue = &ints->value;
@@ -97,23 +79,7 @@ class JsonDatabase : public Database {
                 intAttributes[iter->name.GetString()] = iter->value.GetInt();
             }
         }
-        auto doubles = value.FindMember(DOUBLE_ATTRIBUTES);
-        if (doubles != value.MemberEnd()) {
-            auto doubleValue = &doubles->value;
-            auto iter = doubleValue->MemberBegin();
-            while (iter != doubleValue->MemberEnd()) {
-                doubleAttributes[iter->name.GetString()] = iter->value.GetDouble();
-            }
-        }
-        auto strings = value.FindMember(STRING_ATTRIBUTES);
-        if (doubles != value.MemberEnd()) {
-            auto stringValue = &strings->value;
-            auto iter = stringValue->MemberBegin();
-            while (iter != stringValue->MemberEnd()) {
-                stringAttributes[iter->name.GetString()] = iter->value.GetString();
-            }
-        }
-        return Card{cardId, templateId, intAttributes, doubleAttributes, stringAttributes};
+        return new Card{cardId, templateId, intAttributes};
     }
 
     std::vector<Card *> loadCards(rapidjson::Value &deckValue) {
@@ -122,8 +88,7 @@ class JsonDatabase : public Database {
         auto iter = deckValue.MemberBegin();
         while (iter != deckValue.MemberEnd()) {
             int index = iter->name.GetInt();
-            Card card = deserialize_card(iter->value);
-            cards[index] = &card;
+            cards[index] = deserialize_card(iter->value);
             if (index > max) {
                 max = index;
             }

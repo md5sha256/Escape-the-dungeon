@@ -10,8 +10,13 @@ class Optional {
     T *ptr;
 
     public:
-    explicit Optional(T *t) {
-        ptr = t;
+    explicit Optional(T *t1) {
+        ptr = t1;
+    }
+
+    public:
+    explicit Optional(T &t2) {
+        ptr = &t2;
     }
 
     [[nodiscard]] bool isPresent() const noexcept(true) {

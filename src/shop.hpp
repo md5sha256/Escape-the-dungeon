@@ -6,16 +6,21 @@
 
 struct ShopItem {
 
+    private:
+    Card *card;
+    int gold_cost;
+
+
+    public:
     ShopItem(Card *_card, int cost) {
         card = _card;
         gold_cost = cost;
     }
 
-    private:
-    Card *card;
-    int gold_cost;
+    ~ShopItem() {
+        delete card;
+    }
 
-    public:
     [[nodiscard]] Card *getCard() const {
         return card;
     }
@@ -30,11 +35,12 @@ class Shop {
     private:
     int size;
     protected:
-    std::vector<ShopItem> items;
+    std::vector<ShopItem*> items;
 
     explicit Shop(const int &_size) {
         size = _size;
     }
+
 
     void removeItem(int index) {
         if (index < 0 || index > size - 1) {
@@ -44,7 +50,12 @@ class Shop {
     }
 
     public:
-    virtual ~Shop() = default;
+    virtual ~Shop() {
+        for (const auto &ptr : items) {
+            delete ptr;
+        }
+        items.clear();
+    }
 
     [[nodiscard]] int getOriginalSize() const noexcept(true) {
         return size;
@@ -52,11 +63,6 @@ class Shop {
 
     [[nodiscard]] int getSize() const noexcept(true) {
         return (int) items.size();
-    }
-
-
-    std::vector<ShopItem> getItems() {
-        return items;
     }
 
     virtual void generateItems(GameClient *client) = 0;

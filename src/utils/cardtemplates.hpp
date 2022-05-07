@@ -45,7 +45,8 @@ class SkillPointCardTemplate : public CardTemplate {
     }
 
     void initCard(Card *card) override {
-        int randomValue = rand() % 5 + 1;
+        int randomValue = (rand() % 5) + 1;
+        std::cout << "sp: " << randomValue;
         initCard(card, randomValue);
     }
 
@@ -57,9 +58,8 @@ class SkillPointCardTemplate : public CardTemplate {
         if (amount.isEmpty()) {
             return;
         }
-        std::cout << "Skill Point Card" << std::endl
-                  << std::endl;
-        printf("%s %d \n", "Increase the number of skill points you can allocate by ", *amount.value());
+        std::cout << "Skill Point Card" << std::endl;
+        printf("%s %d\n", "Increase the number of skill points you can allocate by", *amount.value());
     }
 };
 
@@ -95,12 +95,25 @@ class DamageCardTemplate : public CardTemplate {
         return false;
     }
 
+    void displayCard(Card* card) override {
+        if (card->getTemplateId() != getId()) {
+            return;
+        }
+        Optional<int> amount = card->getIntAttribute(DATA_KEY);
+        if (amount.isEmpty()) {
+            return;
+        }
+        int value = *amount.value();
+        std::cout << "Damage Card" << std::endl;
+        std::cout << "When used, this card will deal " << value << " damage to the enemy" << std::endl;
+    }
+
     void initCard(Card *card, const int &amt) {
         card->setIntAttribute(DATA_KEY, clampPositive(amt));
     }
 
     void initCard(Card *card) override {
-        int random = rand() % 10 + 1;
+        int random = randInt(1, 10);
         initCard(card, random);
     }
 };
@@ -143,13 +156,8 @@ class TeleportCardTemplate : public CardTemplate {
     }
 
     void initCard(Card *card) override {
-        int sign;
-        if (rand() % 2) {
-            sign = -1;
-        } else {
-            sign = 1;
-        }
-        int random = rand() % 3 + 1;
+        int sign = randBool() ? -1 : 1;
+        int random = randInt(1, 3);
         initCard(card, sign * random);
     }
 
@@ -163,8 +171,7 @@ class TeleportCardTemplate : public CardTemplate {
         }
         int raw = *distance.value();
         bool positive = raw >= 0;
-        std::cout << "Teleportation Card" << std::endl
-                  << std::endl;
+        std::cout << "Teleportation Card" << std::endl;
         const char *msg = positive ? "forwards." : "backwards.";
         printf("%s %d %s %s\n", "When used, this card will teleport you", std::abs(raw), "spaces", msg);
         std::cout << "However, this card will not allow you to escape the final boss!" << std::endl;
@@ -197,7 +204,7 @@ class WinBattleCardTemplate : public CardTemplate {
         }
         Battle *battle = optionalBattle.value();
         int value = *amt.value();
-        int random = rand() % 101;
+        int random = randIntPercent();
         if (random < value) {
             // The battle was automatically won.
             Optional<Entity> opponent = battle->getCurrentOpponent();
@@ -216,7 +223,7 @@ class WinBattleCardTemplate : public CardTemplate {
     }
 
     void initCard(Card *card) override {
-        int random = rand() % 100 + 1;
+        int random = randIntPercent();
         initCard(card, random);
     }
 
@@ -229,8 +236,7 @@ class WinBattleCardTemplate : public CardTemplate {
             return;
         }
         int percentChance = *amount.value();
-        std::cout << "Ancient Battle Winning Curse" << std::endl
-                  << std::endl;
+        std::cout << "Ancient Battle Winning Curse" << std::endl;
         printf("%s %d%s\n", "When used, this card has a", percentChance, "% chance of instantly killing the enemy!");
     }
 };
@@ -261,8 +267,7 @@ class ReviveCardTemplate : public CardTemplate {
         if (card->getTemplateId() != getId()) {
             return;
         }
-        std::cout << "Revive card" << std::endl
-                  << std::endl;
+        std::cout << "Revive card" << std::endl;
         std::cout << "When used, this card revives the player" << std::endl;
         std::cout << "Use this card only when in dire need." << std::endl;
     }

@@ -27,33 +27,19 @@ struct Card {
     int templateId;
 
     std::map<const std::string, int> intAttributes;
-    std::map<const std::string, double> doubleAttributes;
-    std::map<const std::string, std::string> stringAttributes;
-
-    template<typename T>
-    [[nodiscard]] static Optional<T> getAttribute(const std::string &key, const std::map<const std::string, T> map) {
-        auto iter = map.find(key);
-        if (iter != map.end()) {
-            auto value = iter->second;
-            return Optional<T>(&value);
-        }
-        return nullopt<T>();
-    }
 
     public:
-    Card(const int cardId, const int cardTemplateId) {
+    Card(const int &cardId, const int &cardTemplateId) {
         id = cardId;
         templateId = cardTemplateId;
     }
 
-    Card(int cardId, int cardTemplateId,
-         const std::map<const std::string, int> &ints,
-         const std::map<const std::string, double> &doubles,
-         const std::map<const std::string, std::string> &strings) : Card(cardId, cardTemplateId) {
+    Card(const int &cardId, const int &cardTemplateId,
+         const std::map<const std::string, int> &ints) : Card(cardId, cardTemplateId) {
         intAttributes = ints;
-        doubleAttributes = doubles;
-        stringAttributes = strings;
     }
+
+    ~Card() = default;
 
     [[nodiscard]] int getTemplateId() const {
         return templateId;
@@ -64,39 +50,19 @@ struct Card {
     }
 
     [[nodiscard]] Optional<int> getIntAttribute(const std::string &key) const {
-        return getAttribute<int>(key, intAttributes);
+        auto iter = intAttributes.find(key);
+        if (iter != intAttributes.end()) {
+            int i = iter->second;
+            return Optional<int>(i);
+        }
+        return nullopt<int>();
     }
-
-    [[nodiscard]] Optional<double> getDoubleAttribute(const std::string &key) const {
-        return getAttribute<double>(key, doubleAttributes);
-    }
-
-    [[nodiscard]] Optional<std::string> getStringAttribute(const std::string &key) const {
-        return getAttribute<std::string>(key, stringAttributes);
-    }
-
     void setIntAttribute(const std::string &key, const int &value) {
         intAttributes[key] = value;
     }
 
-    void setDoubleAttribute(const std::string &key, const double &value) {
-        doubleAttributes[key] = value;
-    }
-
-    void setStringAttribute(const std::string &key, const std::string &value) {
-        stringAttributes[key] = value;
-    }
-
     [[nodiscard]] std::map<const std::string, int> getIntAttributes() const {
         return std::map<const std::string, int>{intAttributes};
-    }
-
-    [[nodiscard]] std::map<const std::string, double> getDoubleAttributes() const {
-        return std::map<const std::string, double>{doubleAttributes};
-    }
-
-    [[nodiscard]] std::map<const std::string, std::string> getStringAttributes() const {
-        return std::map<const std::string, std::string>{stringAttributes};
     }
 
 };
@@ -174,7 +140,6 @@ struct Entity {
 
     void setAttributes(std::map<Attribute, int> &_attributes) noexcept(true) {
         for (auto pair : _attributes) {
-            std::cout << pair.second << std::endl;
             attributes[pair.first] = pair.second;
         }
     }
@@ -320,11 +285,16 @@ struct Player : public Entity {
         return position;
     }
 
+    void printGold() const {
+        std::cout << "Gold: " << gold << std::endl;
+    }
 
     void printStatus() {
         printAHD();
-        std::cout << "Skill Points: " << skill_points << std::endl;
+        printUnallocatedSkillPoints();
+        printGold();
     }
+
 
     void printMap() {
         for (int i = 0; i < 10; i++) {
@@ -373,7 +343,7 @@ struct Player : public Entity {
     }
 
     void printUnallocatedSkillPoints() const {
-        std::cout << "You have " << skill_points << " skill unallocated points at the moment" << std::endl;
+        std::cout << "You have " << skill_points << " unallocated skill points at the moment" << std::endl;
         if (skill_points > 0) {
             std::cout << "You can boost either your 'Attack', 'HP' or 'Defence'." << std::endl;
         }
@@ -386,7 +356,6 @@ struct Path {
     std::vector<int> path3;
     //path id: 0 for battle,1 for campfire, 2 for shop,3 for random event
     void generate() {
-        srand(time(nullptr) + 1);
         path1.push_back(0);          //player should encounter battle at the beginning of each path, for earning enough money to buy stuff in shop
         for (int i = 0; i < 8; i++) {//generate the first path
             int j = rand() % 5;
@@ -396,7 +365,6 @@ struct Path {
             } else
                 path1.push_back(0);
         }
-        srand(time(nullptr) + 2);
         path2.push_back(0);          //player should encounter battle at the beginning of each path, for earning enough money to buy stuff in shop
         for (int i = 0; i < 8; i++) {//generate the second path
             int j = rand() % 5;
@@ -407,7 +375,7 @@ struct Path {
                 path2.push_back(0);
         }
         srand(time(NULL) + 3);//generate the third path
-        path3.push_back(0);   //player should encounter battle at the beginning of each path, for earning enough money to buy stuff in shop
+        //player should encounter battle at the beginning of each path, for earning enough money to buy stuff in shop
         for (int i = 0; i < 8; i++) {
             int j = rand() % 5;
             if (j == 4) {//limit the appearance of shop,campfire and random event to 1/5 probability

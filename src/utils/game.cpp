@@ -162,6 +162,7 @@ class SimpleGameClient : public GameClient {
         if (running) {
             return;
         }
+        srand(time(0));
         commandExecutor = newCmdExecutor();
         commandParser = newCmdParser();
         templateRegistry = newRegistry<int, CardTemplate *>();

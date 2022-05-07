@@ -171,7 +171,7 @@ class ShopCommand : public Command {
                 return false;
             }
             int itemIndex = *optional.value();
-            if (itemIndex < 0 || itemIndex > currentShop->getSize() - 1) {
+            if (itemIndex < 1 || itemIndex > currentShop->getSize()) {
                 std::cout << "Invalid index: " + args[1] << std::endl;
                 if (subCommand == "buy" || subCommand == "show") {
                     printUsage(subCommand);
@@ -184,7 +184,7 @@ class ShopCommand : public Command {
             if (subCommand == "buy") {
                 currentShop->buyItem(player, itemIndex);
             } else if (subCommand == "show") {
-                currentShop->printItem(client, player, itemIndex);
+                currentShop->printItem(client, player, itemIndex - 1);
             } else {
                 std::cout << "Unknown subcommand: " << subCommand << std::endl;
                 printUsages();
@@ -268,8 +268,11 @@ class BattleCommand : public Command {
 
     void endBattle(Player *player) {
         battleHandler->endBattle();
+        int gold = randInt(50, 100);
         std::cout << player->getName() << " has defeated those foul beasts. " << std::endl;
         std::cout << player->getName() << " trudges on to meet his next fate." << std::endl;
+        std::cout << player->getName() << " looted " << gold << "." << std::endl;
+        player->printGold();
         player->incrementPosition();
         player->printMap();
     }
@@ -297,6 +300,13 @@ class BattleCommand : public Command {
         opponent->takeDamage(player->getAttribute(Attribute::ATTACK));
         if (opponent->isDead()) {
             std::cout << player->getName() << " has killed the " << opponent->getName() << std::endl;
+        } else {
+            std::cout << opponent->getName() << " strikes back!" << std::endl;
+            player->takeDamage(opponent->getAttribute(Attribute::ATTACK));
+            if (player->isDead()) {
+                std::cout << player->getName() << " was mortally wounded " << std::endl;
+                return true;
+            }
         }
         battle->update();
         if (battle->getNumEnemies() == 0) {
