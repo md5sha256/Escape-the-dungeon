@@ -16,8 +16,7 @@ const int BATTLE_PATH = 0;
 const int CAMPFIRE_PATH = 1;
 const int SHOP_PATH = 2;
 const int EVENT_PATH = 3;
-const int BOSS_PATH = 4;
-const int WIN_PATH = 5;
+const int WIN_PATH = 4;
 
 struct Card {
 
@@ -348,6 +347,7 @@ struct Player : public Entity {
             std::cout << "You can boost either your 'Attack', 'HP' or 'Defence'." << std::endl;
         }
     }
+
 };
 
 struct Path {
@@ -359,7 +359,7 @@ struct Path {
         path1.push_back(0);          //player should encounter battle at the beginning of each path, for earning enough money to buy stuff in shop
         for (int i = 0; i < 8; i++) {//generate the first path
             int j = rand() % 5;
-            if (j == 3) {//limit the appearance of shop,campfire and random event to 1/4 probability
+            if (j == 2 || j == 3) {//limit the appearance of shop,campfire and random event to 1/2 probability
                 int j = (rand() % 3) + 1;
                 path1.push_back(j);
             } else
@@ -384,9 +384,6 @@ struct Path {
             } else
                 path3.push_back(0);
         }
-        path1.push_back(4);//boss generation at the end of each path, with ID of 5
-        path2.push_back(4);
-        path3.push_back(4);
     }
 };
 
@@ -417,9 +414,7 @@ inline void allocateSkillPoints(Player *player) {
 Player *initPlayer();
 
 void performGreetBack(Player *player);
-
 void randomEvent(Player *p);
-void boss(Player p);
 void campfire(Player *p);
 
 #endif//PLAYERINFO_HPP

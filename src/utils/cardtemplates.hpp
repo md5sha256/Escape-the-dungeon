@@ -45,8 +45,7 @@ class SkillPointCardTemplate : public CardTemplate {
     }
 
     void initCard(Card *card) override {
-        int randomValue = (rand() % 5) + 1;
-        std::cout << "sp: " << randomValue;
+        int randomValue = randInt(1, 5);
         initCard(card, randomValue);
     }
 
@@ -58,8 +57,9 @@ class SkillPointCardTemplate : public CardTemplate {
         if (amount.isEmpty()) {
             return;
         }
+        int val = *amount.value();
         std::cout << "Skill Point Card" << std::endl;
-        printf("%s %d\n", "Increase the number of skill points you can allocate by", *amount.value());
+        printf("%s %d\n", "Increase the number of skill points you can allocate by", val);
     }
 };
 

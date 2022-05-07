@@ -74,7 +74,6 @@ Player* initPlayer() {
         std::cout << "You have chosen path " << input << std::endl;
         break;
     }
-    playerPath.insert(playerPath.begin(), SHOP_PATH);
     player->setPath(playerPath);
     return player;
 }

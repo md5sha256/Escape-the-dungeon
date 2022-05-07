@@ -48,7 +48,7 @@ class SimpleGameClient : public GameClient {
 
     void registerCommands() noexcept(false) {
         validateState();
-        Command *echoCommand = new EchoCommand;
+        Command *restartCommand = new RestartCommand(this);
         Command *exitCommand = new ExitCommand(this);
         Command *skillsCommand = new SkillCommand;
         Command *skipCommand = new SkipCommand;
@@ -59,7 +59,7 @@ class SimpleGameClient : public GameClient {
         Command *battleCommand = new BattleCommand(battleHandler);
         Command *cardCommand = new CardsCommand(this);
         commandExecutor->registerCommands({
-            echoCommand, exitCommand, skillsCommand,
+            restartCommand, exitCommand, skillsCommand,
             skipCommand, shopCommand, statusCommand,
             mapCommand, statsCommand, battleCommand,
             cardCommand
@@ -129,13 +129,9 @@ class SimpleGameClient : public GameClient {
                     player->incrementPosition();
                     break;
                 }
-                case BOSS_PATH: {
-                    // when boss is encountered
-                    std::cout << "battle placeholder" << std::endl;
-                    break;
-                }
                 case WIN_PATH: {
-                    std::cout << "win placeholder" << std::endl;
+                    std::cout << player->getName() << " has finally escaped the dungeon!" << std::endl;
+                    std::cout << "type /restart " << " to restart the game" << std::endl;
                     return;
                 }
             }
@@ -179,6 +175,7 @@ class SimpleGameClient : public GameClient {
         registerTemplates();
         registerCommands();
         loadData();
+        checkPosition();
         while (running) {
             if (!awaitUserInput() && running) {
                 checkPosition();
@@ -213,6 +210,15 @@ class SimpleGameClient : public GameClient {
     [[nodiscard]] Database *getDatabase() const noexcept(true) override {
         return database;
     }
+
+    void resetProgress() noexcept(false) override {
+        delete player;
+        player = initPlayer();
+        database->reset();
+        saveData();
+        checkPosition();
+    }
+
 };
 
 GameClient *newGameClient(const std::string &rootDir) noexcept(true) {

@@ -23,7 +23,6 @@ class SimpleShop : public Shop {
         int random = randIntPercent();
         int templateId;
         int price;
-        std::cout << random << std::endl;
         if (random >= chanceLegendary) {
             templateId = randomElement(legendary);
             price = priceLegendary;

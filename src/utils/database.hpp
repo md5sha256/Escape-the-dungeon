@@ -52,6 +52,9 @@ class Database {
     }
 
     virtual void save(const std::string &path, Player &player) noexcept(false) = 0;
+
+
+    virtual void reset() noexcept(false) = 0;
 };
 
 Database *newDatabase(const std::string &path) noexcept(true);

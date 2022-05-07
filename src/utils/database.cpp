@@ -245,6 +245,11 @@ class JsonDatabase : public Database {
     Card *createCard(const int &templateId) noexcept(true) override {
         return new Card{lastCardId++, templateId};
     }
+
+    void reset() noexcept(false) override {
+        lastCardId = 0;
+    }
+
 };
 
 Database *newDatabase(const std::string &path) noexcept(true) {

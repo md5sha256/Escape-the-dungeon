@@ -30,6 +30,8 @@ class GameClient {
 
     [[nodiscard]] virtual Database *getDatabase() const noexcept(true) = 0;
 
+    virtual void resetProgress() noexcept(false) = 0;
+
 
 };
 

@@ -7,21 +7,6 @@
 #include "iostream"
 #include "utils.hpp"
 
-class EchoCommand : public Command {
-
-    public:
-    EchoCommand() : Command("echo") {
-    }
-
-    bool onCommand(Player *player, std::vector<std::string> &args) noexcept(true) override {
-        for (const std::string &s : args) {
-            std::cout << s << " ";
-        }
-        std::cout << std::endl;
-        return true;
-    }
-};
-
 class ExitCommand : public Command {
 
     private:
@@ -115,6 +100,35 @@ class SkipCommand : public Command {
     }
 };
 
+class RestartCommand : public Command {
+
+    private:
+    GameClient *client;
+
+    public:
+    explicit RestartCommand(GameClient *_client) : Command("restart") {
+        client = _client;
+    }
+
+    bool onCommand(Player *player, std::vector<std::string> &args) noexcept(false) override {
+        std::cout << "Are you sure you want to reset your progress? (y/n)" << std::endl;
+        std::string input;
+        std::cin >> input;
+        for (char &c : input) {
+            c = (char) tolower(c);
+        }
+        if (input == "y" || input == "yes") {
+            client->resetProgress();
+            return true;
+        } else if (input != "n" && input != "no") {
+            std::cout << "Aborted shutdown, unknown input " << input << std::endl;
+            return false;
+        }
+        return true;
+    }
+
+};
+
 class ShopCommand : public Command {
 
     Shop *currentShop = nullptr;
@@ -158,6 +172,12 @@ class ShopCommand : public Command {
             printUsages();
             return true;
         }
+        if (subCommand == "show" && args.size() == 1) {
+            for (int i = 0; i < currentShop->getSize(); i++) {
+                currentShop->printItem(client, player, i);
+            }
+            return true;
+        }
         if (args.size() >= 2) {
             Optional<int> optional = fromString(args[1]);
             if (optional.isEmpty()) {
@@ -182,7 +202,7 @@ class ShopCommand : public Command {
                 return false;
             }
             if (subCommand == "buy") {
-                currentShop->buyItem(player, itemIndex);
+                currentShop->buyItem(player, itemIndex - 1);
             } else if (subCommand == "show") {
                 currentShop->printItem(client, player, itemIndex - 1);
             } else {
@@ -263,15 +283,15 @@ class BattleCommand : public Command {
         if (opponent.isPresent()) {
             battle->printOpponent(*opponent.value());
         }
-        std::cout << std::endl;
     }
 
     void endBattle(Player *player) {
         battleHandler->endBattle();
-        int gold = randInt(50, 100);
+        int gold = randInt(10, 50);
         std::cout << player->getName() << " has defeated those foul beasts. " << std::endl;
         std::cout << player->getName() << " trudges on to meet his next fate." << std::endl;
-        std::cout << player->getName() << " looted " << gold << "." << std::endl;
+        std::cout << player->getName() << " looted " << gold << " gold." << std::endl;
+        player->modifyGold(gold);
         player->printGold();
         player->incrementPosition();
         player->printMap();
@@ -299,9 +319,9 @@ class BattleCommand : public Command {
         Entity *opponent = optionalEnemy.value();
         opponent->takeDamage(player->getAttribute(Attribute::ATTACK));
         if (opponent->isDead()) {
-            std::cout << player->getName() << " has killed the " << opponent->getName() << std::endl;
+            std::cout << player->getName() << " has killed the " << opponent->getName() << std::endl << std::endl;
         } else {
-            std::cout << opponent->getName() << " strikes back!" << std::endl;
+            std::cout << std::endl << opponent->getName() << " strikes back!" << std::endl;
             player->takeDamage(opponent->getAttribute(Attribute::ATTACK));
             if (player->isDead()) {
                 std::cout << player->getName() << " was mortally wounded " << std::endl;
