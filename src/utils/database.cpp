@@ -281,6 +281,10 @@ class JsonDatabase : public Database {
         if (skillPoints != document.MemberEnd()) {
             player->modifySkillPoints(skillPoints->value.GetInt());
         }
+        auto pathPos = document.FindMember(PATH_POSITION);
+        if (pathPos != document.MemberEnd()) {
+            player->modifyPosition(pathPos->value.GetInt());
+        }
         auto path = document.FindMember(PATH);
         if (path != document.MemberEnd()) {
             player->setPath(deserializeInts(path->value));
