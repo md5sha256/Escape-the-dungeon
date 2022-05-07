@@ -182,7 +182,7 @@ struct Entity {
 struct Player : public Entity {
 
     private:
-    int skill_points = 0;
+    int skillPoints = 0;
     int gold = 0;
     std::vector<int> path;
     int position = 0;
@@ -239,13 +239,13 @@ struct Player : public Entity {
     }
 
     [[nodiscard]] int getSkillPoints() const {
-        return skill_points;
+        return skillPoints;
     }
 
     void modifySkillPoints(const int &amt) {
-        skill_points += amt;
-        if (skill_points < 0) {
-            skill_points = 0;
+        skillPoints += amt;
+        if (skillPoints < 0) {
+            skillPoints = 0;
         }
     }
 
@@ -324,22 +324,22 @@ struct Player : public Entity {
         if (amt < 0) {
             throw std::invalid_argument("amount cannot be negative!");
         }
-        skill_points += amt;
+        skillPoints += amt;
     }
 
     void removeSkillPoints(const int &amt) {
         if (amt < 0) {
             throw std::invalid_argument("amount cannot be negative!");
         }
-        skill_points += amt;
-        if (skill_points < 0) {
-            skill_points = 0;
+        skillPoints += amt;
+        if (skillPoints < 0) {
+            skillPoints = 0;
         }
     }
 
     void printUnallocatedSkillPoints() const {
-        std::cout << "You have " << skill_points << " unallocated skill points at the moment" << std::endl;
-        if (skill_points > 0) {
+        std::cout << "You have " << skillPoints << " unallocated skill points at the moment" << std::endl;
+        if (skillPoints > 0) {
             std::cout << "You can boost either your 'Attack', 'HP' or 'Defence'." << std::endl;
         }
     }

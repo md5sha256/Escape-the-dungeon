@@ -4,8 +4,6 @@
 #include <iostream>
 #include <string>
 
-int bad_end = 0;
-
 void event1(Player *p) {
     std::cout << p->getName() << " saw a pond of acidic mucus, inside it are some human skulls and left behind jewellery" << std::endl
          << "You can choose to: 1. go into the pond and pick up those jewellery || 2. Leave" << std::endl;
@@ -19,7 +17,6 @@ void event1(Player *p) {
             p->takeDamage(damage);
             if (p->isDead()) {
                 std::cout << p->getName() << " endures the severe pain brought by strong acid, picked up the jewelry in the pond, but never got the chance to go back to the shore again" << std::endl;
-                bad_end = 1;
             } else {
                 int gold = (rand() % 70 + 30);
                 std::cout << p->getName() << " brought back " << gold << " gold from the pond, but suffered " << damage << " damage" << std::endl;
@@ -94,7 +91,8 @@ void event3(Player *p) {
             int trap = (rand() % 3);
             if (trap == 1) {
                 std::cout << p->getName() << " took the status and triggered a device, the last thing he/she remember, is a giant rock falling from the roof..." << std::endl;
-                bad_end = 1;
+                p->kill();
+                std::cout << p->getName() << " was killed by a falling rock.";
             } else {
                 std::cout << p->getName() << " took the status and wondered why such a precious would be placed here " << std::endl;
                 std::cout << "It worth 100 gold!" << std::endl;
@@ -157,6 +155,5 @@ void randomEvent(Player *p) {
             event4(p);
         default:
             throw std::invalid_argument("unexpected random choice: " + std::to_string(choice));
-            return;
     }
 }
