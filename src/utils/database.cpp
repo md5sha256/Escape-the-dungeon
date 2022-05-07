@@ -75,7 +75,7 @@ class JsonDatabase : public Database {
         rapidjson::Value value;
         value.SetObject();
         rapidjson::Document::AllocatorType alloc = document.GetAllocator();
-        for (int i = 0; i < cards.size(); i++) {
+        for (int i = 0; i < (int) cards.size(); i++) {
             rapidjson::Value member = serialize_card(cards[i], alloc);
             auto index = rapidjson::StringRef(std::to_string(i).data());
             value.AddMember(index, member, alloc);

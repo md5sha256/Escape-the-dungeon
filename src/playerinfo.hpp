@@ -237,11 +237,11 @@ struct Player : public Entity {
     }
 
     [[nodiscard]] int getInventorySize() const {
-        return inventory.size();
+        return (int) inventory.size();
     }
 
     Card* getCard(int index) {
-        if (index < 0 || index > inventory.size() - 1) {
+        if (index < 0 || index > getInventorySize() - 1) {
             throw std::invalid_argument("Invalid index: " + std::to_string(index));
         }
         return inventory[index];
@@ -305,14 +305,14 @@ struct Player : public Entity {
     }
 
     void incrementPosition() noexcept(true) {
-        if (position < path.size()) {
+        if (position < (int) path.size()) {
             position++;
         }
     }
 
     int modifyPosition(const int &amt) noexcept(true) {
         position += amt;
-        if (position > path.size() - 1) {
+        if (position > (int) path.size() - 1) {
             position = (int) path.size() - 1;
         } else if (position < 0) {
             position = 0;

@@ -6,9 +6,7 @@
 
 class SimpleShop : public Shop {
 
-    ShopItem generateShopItem(GameClient *client) {
-        Registry<int, CardTemplate *> *registry = client->getCardTemplates();
-
+    static ShopItem generateShopItem(GameClient *client) {
         // LEGENDARY CARDS
         int chanceLegendary = 100 - 10;
         int priceLegendary = 200;
