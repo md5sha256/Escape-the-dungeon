@@ -32,7 +32,6 @@ class SimpleCommandParser : public CommandParser {
             return Optional<CommandData>(new CommandData(cmdName, args));
         } else {
             // Not enough input/blank string
-            //std::cout << "Blank command entered. Please enter a command." << std::endl;
             return nullopt<CommandData>();
         }
     }

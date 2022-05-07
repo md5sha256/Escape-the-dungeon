@@ -23,11 +23,6 @@ struct Battle {
 
     ~Battle() = default;
 
-    public:
-    [[nodiscard]] Player *getPlayer() const {
-        return player;
-    }
-
     [[nodiscard]] int getNumEnemies() const {
         return (int) enemies.size();
     }

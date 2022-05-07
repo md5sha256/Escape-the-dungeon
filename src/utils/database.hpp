@@ -47,10 +47,6 @@ class Database {
 
     virtual Card *createCard(const int &templateId) noexcept(true) = 0;
 
-    Card *createCard(CardTemplate *cardTemplate) noexcept(true) {
-        return createCard(cardTemplate->getId());
-    }
-
     virtual void save(const std::string &path, Player &player) noexcept(false) = 0;
 
 

@@ -11,8 +11,10 @@
 
 #include<iostream>
 
+///Taken from https://www.tutorialspoint.com/find-out-the-current-working-directory-in-c-cplusplus @return a string representing the path of the working dir
 std::string getWorkDir() {
-    char buff[FILENAME_MAX]; //create string buffer to hold path
+    //create string buffer to hold path
+    char buff[FILENAME_MAX];
     GetCurrentDir( buff, FILENAME_MAX );
     std::string current_working_dir(buff);
     return current_working_dir;
