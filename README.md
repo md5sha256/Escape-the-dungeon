@@ -36,6 +36,8 @@ A random incident would be generated, different choices are provided and the pla
 ## Quickstart
 - make demo 
 - run ./demo.o
+Once the game has started, press the enter key to traverse the game.
+You can type /help to get a list of commands which can be used
 
 ## Program process
 - start (Background information, skill point allocation)
